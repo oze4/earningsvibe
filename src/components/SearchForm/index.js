@@ -30,31 +30,35 @@ export default function SearchForm(props) {
           />
         </Col>
         <Col xs="6" md="4" className="mt-1 mb-1">
-          <DatePicker
-            selectsStart
-            showYearDropdown
-            selected={formData.start}
-            startDate={formData.start}
-            endDate={formData.end}
-            openToDate={oneYearAgo()}
-            onChange={(e) => handleSetFormData('start', e)}
-            placeholderText="Start Date"
-            minDate={new Date('1/1/2015')}
-            customInput={<Control />}
-          />
+          <div className="date--range--select">
+            <DatePicker
+              selectsStart
+              showYearDropdown
+              selected={formData.start}
+              startDate={formData.start}
+              endDate={formData.end}
+              openToDate={oneYearAgo()}
+              onChange={(e) => handleSetFormData('start', e)}
+              placeholderText="Start Date"
+              minDate={new Date('1/1/2015')}
+              customInput={<Control />}
+            />
+          </div>
         </Col>
         <Col xs="6" md="4" className="mt-1 mb-1">
-          <DatePicker
-            selectsEnd
-            selected={formData.end}
-            startDate={formData.start}
-            endDate={formData.end}
-            openToDate={now()}
-            onChange={(e) => handleSetFormData('end', e)}
-            placeholderText="End Date"
-            minDate={formData.start}
-            customInput={<Control />}
-          />
+          <div className="date--range--select">
+            <DatePicker
+              selectsEnd
+              selected={formData.end}
+              startDate={formData.start}
+              endDate={formData.end}
+              openToDate={now()}
+              onChange={(e) => handleSetFormData('end', e)}
+              placeholderText="End Date"
+              minDate={formData.start}
+              customInput={<Control />}
+            />
+          </div>
         </Col>
       </Group>
       <Group>
