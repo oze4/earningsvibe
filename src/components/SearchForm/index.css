@@ -1,0 +1,11 @@
+.date--range--select,
+.date--range--select > div.react-datepicker-wrapper,
+.date--range--select
+  > div
+  > div.react-datepicker__input-container
+  .date--range--select
+  > div
+  > div.react-datepicker__input-container
+  input {
+  width: 100%;
+}

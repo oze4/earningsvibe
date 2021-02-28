@@ -1,24 +1,29 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useState, useEffect } from 'react';
+import { Container } from 'react-bootstrap';
+import { Topbar, BodyContainer, SearchForm } from './components';
 
 function App() {
+  const [formData, setFormData] = useState(undefined);
+
+  const handleOnSubmit = (event, formdata) => {
+    setFormData(formdata);
+  };
+
+  useEffect(() => {
+    if (formData !== undefined) {
+      console.log('new query submitted', { formData });
+    }
+  }, [formData]);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Container fluid className="pl-0 pr-0 bg-gray">
+      <Topbar brand="earningsvibe.com" expand="lg" />
+      <BodyContainer className="mt-2">
+        <SearchForm
+          onSubmit={(event, formdata) => handleOnSubmit(event, formdata)}
+        />
+      </BodyContainer>
+    </Container>
   );
 }
 
