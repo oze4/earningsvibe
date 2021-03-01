@@ -1,1 +1,6 @@
-Earnings data plus charts from historical earnings, so you can better gauge historical bias accurately and quickly.
+# Earnings Vibe
+
+### Quickly gauge historical bias
+
+Earnings data with historical charts from the days earnings were reported. 
+
