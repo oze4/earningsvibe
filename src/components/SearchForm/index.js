@@ -21,8 +21,11 @@ export default function SearchForm(props) {
       <Group as={Row} className="justify-content-md-center text-center">
         <Col xs="6" className="mt-1 mb-1">
           <Control
-            onChange={(e) => handleSetFormData('ticker', e.target.value)}
+            onChange={(e) =>
+              handleSetFormData('ticker', String(e.target.value).toUpperCase())
+            }
             placeholder="Ticker"
+            value={formData.ticker}
           />
         </Col>
         <Col xs="6" className="mt-1 mb-1">

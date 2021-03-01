@@ -10,7 +10,6 @@ const appPort = 8081;
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(helmet());
-app.use(express.static(path.join(__dirname, '../build')));
 app.use('/static', express.static(path.join(__dirname, '../build/static')));
 
 app.get('/', (_req, res) => {
@@ -26,15 +25,15 @@ app.get('/api/profile/:symbol', async (req, res) => {
   }
 });
 
-app.get('/api/earnings/:symbol/:yearsAgo', async (req, res) => {
+app.get('/api/earnings/:symbol', async (req, res) => {
   try {
-    const { symbol, yearsAgo } = req.params;
-    if (!yearsAgo) {
-      yearsAgo = 1;
-    }
+    const { symbol } = req.params;
+    let { yearsAgo } = req.query;
+    if (!yearsAgo) yearsAgo = 1;
     const data = await fmpcloud.HistoricalEarnings(symbol, yearsAgo);
     res.status(200).send(data);
   } catch (err) {
+    console.log(err);
     res.status(500).send(err);
   }
 });

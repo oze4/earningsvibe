@@ -11,9 +11,11 @@ module.exports = class FMPCloud {
     this._apiKey = apikey !== null ? apikey : process.env.FMPCLOUD_API_KEY;
   }
 
-  CompanyProfile = async (symbol) => {
+  CompanyProfile = async (symbol = '') => {
     try {
-      const url = `${this._baseURL}/profile/${symbol}?apikey=${this._apiKey}`;
+      const url = `${this._baseURL}/profile/${symbol.toUpperCase()}?apikey=${
+        this._apiKey
+      }`;
       const res = await got(url);
       return JSON.parse(res.body);
     } catch (err) {
@@ -21,12 +23,15 @@ module.exports = class FMPCloud {
     }
   };
 
-  HistoricalEarnings = async (symbol, yearsAgo = 1) => {
+  HistoricalEarnings = async (symbol = '', yearsAgo = 1) => {
     try {
-      // Since the API expects limit N num of earnings,
-      // we use this rough formula of 4 earnings per year
+      // Since the API expects limit N num of earnings, we use this rough formula of 4 earnings per year
       const limit = yearsAgo * 4;
-      const url = `${this._baseURL}/historical/earning_calendar/${symbol}?limit=${limit}&apikey=${this._apiKey}`;
+      const url = `${
+        this._baseURL
+      }/historical/earning_calendar/${symbol.toUpperCase()}?limit=${limit}&apikey=${
+        this._apiKey
+      }`;
       const res = await got(url);
       return JSON.parse(res.body);
     } catch (err) {

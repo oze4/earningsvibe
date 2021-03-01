@@ -42,7 +42,7 @@ export default function AlertToast(props) {
       show={show}
     >
       <Toast.Header
-        closeButton={false}
+        closeButton
         style={{ color: color, backgroundColor: bgcolor }}
       >
         <img className="rounded mr-2" alt="" />
