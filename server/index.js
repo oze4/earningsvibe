@@ -18,23 +18,30 @@ app.get('/', (_req, res) => {
 
 app.get('/api/profile/:symbol', async (req, res) => {
   try {
-    const data = await fmpcloud.CompanyProfile(req.params.symbol);
+    const { symbol } = req.params;
+    const data = await fmpcloud.CompanyProfile(symbol);
     res.status(200).send(data);
   } catch (err) {
-    res.status(500).send(err);
+    console.log(err);
+    res.status(500).send(null);
   }
 });
 
 app.get('/api/earnings/:symbol', async (req, res) => {
   try {
     const { symbol } = req.params;
-    let { yearsAgo } = req.query;
-    if (!yearsAgo) yearsAgo = 1;
-    const data = await fmpcloud.HistoricalEarnings(symbol, yearsAgo);
+    const { yearsAgo } = req.query;
+
+    let _yearsAgo = yearsAgo;
+    if (!yearsAgo) {
+      _yearsAgo = 1;
+    }
+
+    const data = await fmpcloud.HistoricalEarnings(symbol, _yearsAgo);
     res.status(200).send(data);
   } catch (err) {
     console.log(err);
-    res.status(500).send(err);
+    res.status(500).send(null);
   }
 });
 
