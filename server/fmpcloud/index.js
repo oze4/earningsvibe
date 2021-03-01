@@ -3,14 +3,12 @@ const got = require('got');
 
 dotenv.config();
 
-const { env } = process;
-
 module.exports = class FMPCloud {
   _baseURL = 'https://fmpcloud.io/api/v3';
   _apiKey = '';
 
   constructor(apikey = null) {
-    this._apiKey = apikey !== null ? apikey : env.FMPCLOUD_API_KEY;
+    this._apiKey = apikey !== null ? apikey : process.env.FMPCLOUD_API_KEY;
   }
 
   CompanyProfile = async (symbol) => {
