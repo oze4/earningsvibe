@@ -7,16 +7,6 @@ const fmpcloud = new FMPCloud();
 const app = express();
 const appPort = 8081;
 
-const getDatePriorToDate = (date, daysPrior = 1) => {
-  const d = new Date(date);
-  return new Date(d.setDate(d.getDate() - daysPrior));
-}
-
-const getDateAfterDate = (date, daysAfter) => {
-  const d = new Date(date);
-  return new Date(d.setDate(d.getDate() + daysAfter));
-}
-
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(helmet());
