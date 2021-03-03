@@ -114,12 +114,9 @@ module.exports = class FMPCloud {
       // We need to get stock data for the 'buffer' range (a couple of days before and after earnings).
       // That is why we map thru earnings to get stock data.
       const stockdataRequests = earnings.map((e) => {
-        return this.HistoricalStock(
-          symbol,
-          e.daysBefore,
-          e.daysAfter,
-          { earningsDate: e.date }
-        );
+        return this.HistoricalStock(symbol, e.daysBefore, e.daysAfter, {
+          earningsDate: e.date
+        });
       });
       const stockdataRaw = await Promise.all(stockdataRequests);
       return earnings.map((e) => {

@@ -1,35 +1,32 @@
-import React, { useState } from 'react';
-import { Container, Spinner } from 'react-bootstrap';
+import React, { useState, useEffect } from 'react';
+import { Container, Col, Row, Spinner } from 'react-bootstrap';
 
 import {
   Topbar,
   BodyContainer,
   SearchForm,
   AlertToast,
-  StockChart
+  CandleStickChartWithMA
 } from './components';
-
-import { getData } from '../src/components/StockChart/utils';
 
 function App() {
   const [stockData, setStockData] = useState(undefined);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
 
+  useEffect(() => {
+    if (isSubmitting) {
+    }
+  }, [isSubmitting]);
+
   const handleOnSubmit = async (event, formdata) => {
     setIsSubmitting(true);
     if (!formdata.ticker || !formdata.yearsAgo) {
       setError('All fields are required!');
     }
-
-    // getData()
-    //   .then((datas) => {
-    //     console.log(datas);
-    //     setStockData(datas);
-    //   })
-    //   .catch((err) => console.log(err));
-
-    const resp = await fetch(`/api/vibe_check/${formdata.ticker}/${formdata.yearsAgo}`);
+    const resp = await fetch(
+      `/api/vibe_check/${formdata.ticker}/${formdata.yearsAgo}`
+    );
     const json = await resp.json();
     setStockData(json);
     setIsSubmitting(false);
@@ -48,7 +45,19 @@ function App() {
         <SearchForm
           onSubmit={(event, formdata) => handleOnSubmit(event, formdata)}
         />
-        <pre>{JSON.stringify(stockData, null, 2)}</pre>
+        {isSubmitting && !stockData ? (
+          <Row>
+            <Col>
+              <Spinner animation="border" role="status">
+                <span className="sr-only">Loading...</span>
+              </Spinner>
+            </Col>
+          </Row>
+        ) : (
+          !isSubmitting &&
+          stockData &&
+          stockData.map((sd) => <CandleStickChartWithMA data={sd.stockData} />)
+        )}
       </BodyContainer>
     </Container>
   );
