@@ -111,26 +111,28 @@ module.exports = class FMPCloud {
   VibeCheck = async (symbol = '', yearsAgo = 1) => {
     try {
       const earnings = await this.HistoricalEarnings(symbol, yearsAgo);
-      const stockdataRequests = earnings.map((earning) => {
+      // We need to get stock data for the 'buffer' range (a couple of days before and after earnings).
+      // That is why we map thru earnings to get stock data.
+      const stockdataRequests = earnings.map((e) => {
         return this.HistoricalStock(
           symbol,
-          earning.daysBefore,
-          earning.daysAfter,
-          { earningsDate: earning.date }
+          e.daysBefore,
+          e.daysAfter,
+          { earningsDate: e.date }
         );
       });
-      const rawstockdata = await Promise.all(stockdataRequests);
+      const stockdataRaw = await Promise.all(stockdataRequests);
       return earnings.map((e) => {
-        let stockData = [];
-        rawstockdata.forEach((s) => {
+        let stockdata = 'Stock data not found';
+        stockdataRaw.forEach((s) => {
           // Since we get a couple days before and after earnings (so an array of stock data) it doesn't
           // matter which element in the array we check the earningsDate prop on, since each element will
           // have the same earningsDate prop.
           if (s.length && s[0].earningsDate === e.date) {
-            stockData = s;
+            stockdata = s;
           }
         });
-        return { stockData, ...e };
+        return { stockData: stockdata, ...e };
       });
     } catch (e) {
       console.log(`Error : VibeCheck : ${e}`);
