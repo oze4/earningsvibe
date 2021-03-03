@@ -16,19 +16,22 @@ function App() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
 
-  const handleOnSubmit = (event, formdata) => {
+  const handleOnSubmit = async (event, formdata) => {
     setIsSubmitting(true);
     if (!formdata.ticker || !formdata.yearsAgo) {
       setError('All fields are required!');
     }
 
-    getData()
-      .then((datas) => {
-        console.log(datas);
-        setStockData(datas);
-      })
-      .catch((err) => console.log(err));
+    // getData()
+    //   .then((datas) => {
+    //     console.log(datas);
+    //     setStockData(datas);
+    //   })
+    //   .catch((err) => console.log(err));
 
+    const resp = await fetch(`/api/vibe_check/${formdata.ticker}/${formdata.yearsAgo}`);
+    const json = await resp.json();
+    setStockData(json);
     setIsSubmitting(false);
   };
 
@@ -45,15 +48,7 @@ function App() {
         <SearchForm
           onSubmit={(event, formdata) => handleOnSubmit(event, formdata)}
         />
-        {isSubmitting && !stockData ? (
-          <div style={{ textAlign: 'center' }}>
-            <Spinner animation="border" role="status">
-              <span className="sr-only">Loading...</span>
-            </Spinner>
-          </div>
-        ) : (
-          <StockChart stockData={stockData} />
-        )}
+        <pre>{JSON.stringify(stockData, null, 2)}</pre>
       </BodyContainer>
     </Container>
   );

@@ -132,7 +132,7 @@ module.exports = class FMPCloud {
             stockdata = s;
           }
         });
-        return { stockData: stockdata, ...e };
+        return { ...e, stockData: stockdata };
       });
     } catch (e) {
       console.log(`Error : VibeCheck : ${e}`);
