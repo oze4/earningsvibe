@@ -1,5 +1,6 @@
 const dotenv = require('dotenv');
 const got = require('got');
+const { getRelativeDate } = require('../../src/utils');
 
 dotenv.config();
 
@@ -14,57 +15,125 @@ module.exports = class FMPCloud {
   _formatDateString = (date = Date.now()) => {
     const x = new Date(date);
     const year = x.getFullYear();
-    const month = x.getMonth();
+    const month = x.getMonth() + 1;
     const day = x.getDate();
     return `${year}-${month}-${day}`;
   };
 
   CompanyProfile = async (symbol = '') => {
     try {
-      const url = `${this._baseURL}/profile/${symbol.toUpperCase()}?apikey=${
-        this._apiKey
-      }`;
-      const res = await got(url);
-      return JSON.parse(res.body);
-    } catch (err) {
-      throw err.response.body;
+      const a = this._apiKey;
+      const b = this._baseURL;
+      const s = symbol.toUpperCase();
+      const u = `${b}/profile/${s}?apikey=${a}`;
+      const r = await got(u);
+      return JSON.parse(r.body);
+    } catch (e) {
+      console.log('Error : CompanyProfile : ', e);
+      throw e;
     }
   };
 
   HistoricalEarnings = async (symbol = '', yearsAgo = 1) => {
     try {
       // Since the API expects limit N num of earnings, we use this rough formula of 4 earnings per year
-      const limit = yearsAgo * 4;
-      const url = `${
-        this._baseURL
-      }/historical/earning_calendar/${symbol.toUpperCase()}?limit=${limit}&apikey=${
-        this._apiKey
-      }`;
-      const res = await got(url);
-      return JSON.parse(res.body);
-    } catch (err) {
-      throw err.response.body;
+      const l = yearsAgo * 4;
+      const b = this._baseURL;
+      const a = this._apiKey;
+      const s = symbol.toUpperCase();
+      const u = `${b}/historical/earning_calendar/${s}?limit=${l}&apikey=${a}`;
+      const r = await got(u);
+      const earnings = JSON.parse(r.body);
+      // Add 'year' prop to each object
+      const finalEarnings = earnings.map((e) => {
+        const d = new Date(e.date);
+        const y = d.getFullYear();
+        const b = getRelativeDate('before', 5, d);
+        const a = getRelativeDate('after', 5, d);
+        return { year: y, daysBefore: b, daysAfter: a, ...e };
+      });
+      return finalEarnings;
+    } catch (e) {
+      console.log('Error : HistoricalEarnings : ', e);
+      throw e;
     }
   };
 
+  /**
+   * Get historical stock info
+   * @param {String} symbol stock ticker symbol
+   * @param {Date} startDate starting date range
+   * @param {Date} endDate ending date range
+   * @param {String} timePeriod must be one of: ("1min"|"5min"|"15min"|"30min"|"1hour"|"1day")
+   */
   HistoricalStock = async (
     symbol,
     startDate = Date.now(),
-    endDate = Date.now()
+    endDate = Date.now(),
+    metadata = {},
+    timePeriod = '1day' // must be one of: ("1min"|"5min"|"15min"|"30min"|"1hour"|"1day")
   ) => {
+    // Param validation
+    const allowedTimePeriods = [
+      '1day',
+      '1min',
+      '5min',
+      '15min',
+      '30min',
+      '1hour'
+    ];
+    if (!allowedTimePeriods.includes(timePeriod)) {
+      const m = `timePeriod not allowed!\n\tgot '${timePeriod}'\n\texpected one of : '${allowedTimePeriods}'`;
+      throw new Error(m);
+    }
+
+    // This check is important. If you want a 1day chart, you leave the param
+    // empty (that's just how fmpcloud takes it)...
+    if (timePeriod === '1day') {
+      timePeriod = '';
+    }
+
     try {
       const b = this._baseURL;
       const a = this._apiKey;
       const s = this._formatDateString(startDate);
       const e = this._formatDateString(endDate);
-
       const url = `${b}/historical-price-full/${symbol}?from=${s}&to=${e}&apikey=${a}`;
-
       const res = await got(url);
-      return JSON.parse(res.body);
+      const body = JSON.parse(res.body);
+      return body.historical.map((b) => ({ ...b, ...metadata }));
     } catch (err) {
-      console.log(`Error : [fmpcloud.HistoricalStock] : ${err}`);
+      console.log(`Error : [HistoricalStock] : ${err.response.body}`);
       throw err.response.body;
+    }
+  };
+
+  VibeCheck = async (symbol = '', yearsAgo = 1) => {
+    try {
+      const earnings = await this.HistoricalEarnings(symbol, yearsAgo);
+      const stockdataRequests = earnings.map((earning) => {
+        return this.HistoricalStock(
+          symbol,
+          earning.daysBefore,
+          earning.daysAfter,
+          { earningsDate: earning.date }
+        );
+      });
+      const rawstockdata = await Promise.all(stockdataRequests);
+      return earnings.map((e) => {
+        let stockData = [];
+        rawstockdata.forEach((s) => {
+          // Since we get a couple days before and after earnings (so an array of stock data) it doesn't
+          // matter which element in the array we check the earningsDate prop on, since each element will
+          // have the same earningsDate prop.
+          if (s.length && s[0].earningsDate === e.date) {
+            stockData = s;
+          }
+        });
+        return { stockData, ...e };
+      });
+    } catch (e) {
+      console.log(`Error : VibeCheck : ${e}`);
     }
   };
 };

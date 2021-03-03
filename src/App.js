@@ -1,26 +1,34 @@
 import React, { useState } from 'react';
 import { Container, Spinner } from 'react-bootstrap';
+
 import {
   Topbar,
   BodyContainer,
   SearchForm,
   AlertToast,
-  EarningsCard
+  StockChart
 } from './components';
 
+import { getData } from '../src/components/StockChart/utils';
+
 function App() {
-  const [formData, setFormData] = useState(undefined);
   const [stockData, setStockData] = useState(undefined);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
 
   const handleOnSubmit = (event, formdata) => {
     setIsSubmitting(true);
-    if (formdata.ticker === '' || formdata.yearsAgo === '') {
+    if (!formdata.ticker || !formdata.yearsAgo) {
       setError('All fields are required!');
-    } else {
-      setFormData(formdata);
     }
+
+    getData()
+      .then((datas) => {
+        console.log(datas);
+        setStockData(datas);
+      })
+      .catch((err) => console.log(err));
+
     setIsSubmitting(false);
   };
 
@@ -37,14 +45,14 @@ function App() {
         <SearchForm
           onSubmit={(event, formdata) => handleOnSubmit(event, formdata)}
         />
-        {stockData !== undefined && isSubmitting ? (
+        {isSubmitting && !stockData ? (
           <div style={{ textAlign: 'center' }}>
             <Spinner animation="border" role="status">
               <span className="sr-only">Loading...</span>
             </Spinner>
           </div>
         ) : (
-          <EarningsCard data={stockData} />
+          <StockChart stockData={stockData} />
         )}
       </BodyContainer>
     </Container>
