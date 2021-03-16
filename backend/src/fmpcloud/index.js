@@ -1,6 +1,6 @@
 const dotenv = require('dotenv');
 const got = require('got');
-const { getRelativeDate } = require('../../src/utils');
+const { getRelativeDate } = require('../utils');
 
 dotenv.config();
 
@@ -45,11 +45,12 @@ module.exports = class FMPCloud {
       const r = await got(u);
       const earnings = JSON.parse(r.body);
       // Add 'year' prop to each object
+      // Changes prop `changePercent` to `percentChange`
       const finalEarnings = earnings.map((e) => {
         const d = new Date(e.date);
         const y = d.getFullYear();
-        const b = getRelativeDate('before', 5, d);
-        const a = getRelativeDate('after', 5, d);
+        const b = getRelativeDate('before', 60, d);
+        const a = getRelativeDate('after', 60, d);
         return { year: y, daysBefore: b, daysAfter: a, ...e };
       });
       return finalEarnings;
@@ -83,7 +84,9 @@ module.exports = class FMPCloud {
       '1hour'
     ];
     if (!allowedTimePeriods.includes(timePeriod)) {
-      const m = `timePeriod not allowed!\n\tgot '${timePeriod}'\n\texpected one of : '${allowedTimePeriods}'`;
+      const m = `timePeriod not allowed!\n\tgot '${JSON.stringify(
+        timePeriod
+      )}'\n\texpected one of : '${allowedTimePeriods}'`;
       throw new Error(m);
     }
 
@@ -98,41 +101,70 @@ module.exports = class FMPCloud {
       const a = this._apiKey;
       const s = this._formatDateString(startDate);
       const e = this._formatDateString(endDate);
+
       const url = `${b}/historical-price-full/${symbol}?from=${s}&to=${e}&apikey=${a}`;
       const res = await got(url);
-      const body = JSON.parse(res.body);
-      return body.historical.map((b) => ({ ...b, ...metadata }));
+      const json = JSON.parse(res.body);
+
+      return (
+        json.historical &&
+        json.historical.length &&
+        json.historical.map((h) => {
+          const c = {
+            ...h,
+            percentChange: h.changePercent, //  rename changePercent to percentChange
+            date: new Date(h.date)
+          };
+          delete c.changePercent; // remove changePercent prop
+          return { ...c, ...metadata }; // combine metadata with final object
+        })
+      );
     } catch (err) {
-      console.log(`Error : [HistoricalStock] : ${err.response.body}`);
-      throw err.response.body;
+      console.log(`Error : [HistoricalStock] : ${err}`);
+      throw err;
     }
   };
 
   VibeCheck = async (symbol = '', yearsAgo = 1) => {
     try {
       const earnings = await this.HistoricalEarnings(symbol, yearsAgo);
+      console.log('got earnings', { earnings });
+
       // We need to get stock data for the 'buffer' range (a couple of days before and after earnings).
       // That is why we map thru earnings to get stock data.
       const stockdataRequests = earnings.map((e) => {
-        return this.HistoricalStock(symbol, e.daysBefore, e.daysAfter, {
-          earningsDate: e.date
-        });
+        return this.HistoricalStock(
+          symbol,
+          e.daysBefore,
+          e.daysAfter,
+          {},
+          '1min',
+          {
+            earningsDate: e.date
+          }
+        );
       });
+
       const stockdataRaw = await Promise.all(stockdataRequests);
+      console.log('got stockdataRaw');
+
       return earnings.map((e) => {
         let stockdata = 'Stock data not found';
-        stockdataRaw.forEach((s) => {
+
+        stockdataRaw.forEach((sdr) => {
           // Since we get a couple days before and after earnings (so an array of stock data) it doesn't
           // matter which element in the array we check the earningsDate prop on, since each element will
-          // have the same earningsDate prop.
-          if (s.length && s[0].earningsDate === e.date) {
-            stockdata = s;
+          // have the same earningsDate prop. We add the earningsDate prop to the object received from
+          // fmpcloud.io.
+          if (sdr.length > 0 && sdr[0].earningsDate === e.date) {
+            stockdata = sdr;
           }
         });
+
         return { ...e, stockData: stockdata };
       });
     } catch (e) {
-      console.log(`Error : VibeCheck : ${e}`);
+      console.log(`Error : [VibeCheck] : ${e}`);
     }
   };
 };

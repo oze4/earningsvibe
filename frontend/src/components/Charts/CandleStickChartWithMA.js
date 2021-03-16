@@ -35,7 +35,7 @@ class CandleStickChartWithMA extends React.Component {
         windowSize: 20, // optional will default to 10
         sourcePath: 'close' // optional will default to close as the source
       })
-      .skipUndefined(true) // defaults to true
+      .skipUndefined(false) // defaults to true
       .merge((d, c) => {
         d.ema20 = c;
       }) // Required, if not provided, log a error
@@ -85,7 +85,7 @@ class CandleStickChartWithMA extends React.Component {
       sma20(wma20(tma20(ema50(smaVolume50(initialData)))))
     );
     const xScaleProvider = discontinuousTimeScaleProvider.inputDateAccessor(
-      (d) => d.date
+      (d) => new Date(d.date)
     );
     const { data, xScale, xAccessor, displayXAccessor } = xScaleProvider(
       calculatedData
@@ -253,7 +253,8 @@ CandleStickChartWithMA.propTypes = {
 };
 
 CandleStickChartWithMA.defaultProps = {
-  type: 'svg'
+  type: 'svg',
+  width: 400
 };
 
 CandleStickChartWithMA = fitWidth(CandleStickChartWithMA);

@@ -14,13 +14,7 @@ function App() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
 
-  useEffect(() => {
-    if (isSubmitting) {
-    }
-  }, [isSubmitting]);
-
   const handleOnSubmit = async (event, formdata) => {
-    setIsSubmitting(true);
     if (!formdata.ticker || !formdata.yearsAgo) {
       setError('All fields are required!');
     }
@@ -28,9 +22,51 @@ function App() {
       `/api/vibe_check/${formdata.ticker}/${formdata.yearsAgo}`
     );
     const json = await resp.json();
+
+    console.log({ json });
+
     setStockData(json);
-    setIsSubmitting(false);
   };
+
+  const stockDataExists = () => stockData !== undefined && stockData.length > 0;
+
+  let toRender = <div></div>;
+
+  if (isSubmitting && stockDataExists()) {
+    toRender = (
+      <Row>
+        <Col
+          style={{
+            width: '100%',
+            border: '1px solid black',
+            marginBottom: '10px'
+          }}
+        >
+          <Spinner animation="border" role="status">
+            <span className="sr-only">Loading...</span>
+          </Spinner>
+        </Col>
+      </Row>
+    );
+  }
+
+  if (!isSubmitting && stockDataExists()) {
+    toRender = <pre>{JSON.stringify(stockData, null, 2)}</pre>;
+    /*
+    toRender = stockData.map((sd) => (
+      <div>
+        <h1>{sd.date}</h1>
+        <CandleStickChartWithMA
+          type="svg"
+          data={sd.stockData.sort(
+            (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
+          )}
+        />
+        <pre>{JSON.stringify(sd, null, 2)}</pre>
+      </div>
+    ));
+    */
+  }
 
   return (
     <Container fluid className="pl-0 pr-0 bg-gray">
@@ -45,19 +81,7 @@ function App() {
         <SearchForm
           onSubmit={(event, formdata) => handleOnSubmit(event, formdata)}
         />
-        {isSubmitting && !stockData ? (
-          <Row>
-            <Col>
-              <Spinner animation="border" role="status">
-                <span className="sr-only">Loading...</span>
-              </Spinner>
-            </Col>
-          </Row>
-        ) : (
-          !isSubmitting &&
-          stockData &&
-          stockData.map((sd) => <CandleStickChartWithMA data={sd.stockData} />)
-        )}
+        {toRender}
       </BodyContainer>
     </Container>
   );
