@@ -34,10 +34,10 @@ module.exports = class FMPCloud {
     }
   };
 
-  HistoricalEarnings = async (symbol = '', yearsAgo = 1) => {
+  HistoricalEarnings = async (symbol = '', numberOfPriorEarnings = 1) => {
     try {
       // Since the API expects limit N num of earnings, we use this rough formula of 4 earnings per year
-      const l = yearsAgo * 4;
+      const l = numberOfPriorEarnings;
       const b = this._baseURL;
       const a = this._apiKey;
       const s = symbol.toUpperCase();

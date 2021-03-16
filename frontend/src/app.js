@@ -76,7 +76,13 @@ function App() {
         variant="error"
         onClose={() => setError('')}
       />
-      <Topbar brand="earningsvibe.com" expand="lg" />
+      <Topbar
+        brand="earningsvibe.com"
+        expand="lg"
+        bg="primary"
+        searchButtonText="Vibe Check"
+        searchPlaceholderText="Ticker"
+      />
       <BodyContainer className="mt-2">
         <SearchForm
           onSubmit={(event, formdata) => handleOnSubmit(event, formdata)}
