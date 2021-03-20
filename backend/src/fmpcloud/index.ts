@@ -5,20 +5,17 @@ import got from 'got';
 import { getRelativeDate } from '../utils';
 
 export default class FMPCloud {
-  _baseURL = 'https://fmpcloud.io/api/v3';
-  _apiKey = '';
+  #baseURL = 'https://fmpcloud.io/api/v3';
+  #apiKey = '';
 
   constructor(apikey = '') {
-    if (apikey !== '') {
-      this._apiKey = apikey;
-    } else {
-      if (process.env.FMPCLOUD_API_KEY) {
-        this._apiKey = process.env.FMPCLOUD_API_KEY;
-      }
+    if (apikey === '') {
+      throw new Error('Error : FMPCloud : apikey is required!');
     }
+    this.#apiKey = apikey;
   }
 
-  _formatDateString = (date = Date.now()) => {
+  _formatDateString = (date: Date = new Date(Date.now())) => {
     const x = new Date(date);
     const year = x.getFullYear();
     const month = x.getMonth() + 1;
@@ -28,8 +25,8 @@ export default class FMPCloud {
 
   CompanyProfile = async (symbol = '') => {
     try {
-      const a = this._apiKey;
-      const b = this._baseURL;
+      const a = this.#apiKey;
+      const b = this.#baseURL;
       const s = symbol.toUpperCase();
       const u = `${b}/profile/${s}?apikey=${a}`;
       const r = await got(u);
@@ -44,15 +41,15 @@ export default class FMPCloud {
     try {
       // Since the API expects limit N num of earnings, we use this rough formula of 4 earnings per year
       const l = numberOfPriorEarnings;
-      const b = this._baseURL;
-      const a = this._apiKey;
+      const b = this.#baseURL;
+      const a = this.#apiKey;
       const s = symbol.toUpperCase();
       const u = `${b}/historical/earning_calendar/${s}?limit=${l}&apikey=${a}`;
       const r = await got(u);
       const earnings = JSON.parse(r.body);
       // Add 'year' prop to each object
       // Changes prop `changePercent` to `percentChange`
-      const finalEarnings = earnings.map((e) => {
+      const finalEarnings = earnings.map((e: EarningsData) => {
         const d = new Date(e.date);
         const y = d.getFullYear();
         const b = getRelativeDate(BeforeOrAfter.before, 60, d);
@@ -71,40 +68,19 @@ export default class FMPCloud {
    * @param {String} symbol stock ticker symbol
    * @param {Date} startDate starting date range
    * @param {Date} endDate ending date range
-   * @param {String} timePeriod must be one of: ("1min"|"5min"|"15min"|"30min"|"1hour"|"1day")
+   * @param {object} metadata any data you would like to add to the object
+   * @param {TimePeriod} timePeriod must be one of: ("1min"|"5min"|"15min"|"30min"|"1hour"|"1day")
    */
   HistoricalStock = async (
-    symbol,
-    startDate = Date.now(),
-    endDate = Date.now(),
-    metadata = {},
-    timePeriod = '1day' // must be one of: ("1min"|"5min"|"15min"|"30min"|"1hour"|"1day")
+    symbol: string,
+    startDate: Date = new Date(Date.now()),
+    endDate: Date = new Date(Date.now()),
+    metadata: object = {},
+    timePeriod: TimePeriod = TimePeriod.OneDay
   ) => {
-    // Param validation
-    const allowedTimePeriods = [
-      '1day',
-      '1min',
-      '5min',
-      '15min',
-      '30min',
-      '1hour'
-    ];
-    if (!allowedTimePeriods.includes(timePeriod)) {
-      const m = `timePeriod not allowed!\n\tgot '${JSON.stringify(
-        timePeriod
-      )}'\n\texpected one of : '${allowedTimePeriods}'`;
-      throw new Error(m);
-    }
-
-    // This check is important. If you want a 1day chart, you leave the param
-    // empty (that's just how fmpcloud takes it)...
-    if (timePeriod === '1day') {
-      timePeriod = '';
-    }
-
     try {
-      const b = this._baseURL;
-      const a = this._apiKey;
+      const b = this.#baseURL;
+      const a = this.#apiKey;
       const s = this._formatDateString(startDate);
       const e = this._formatDateString(endDate);
 
