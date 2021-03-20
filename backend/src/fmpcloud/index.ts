@@ -1,15 +1,21 @@
-const dotenv = require('dotenv');
-const got = require('got');
-const { getRelativeDate } = require('../utils');
-
+import dotenv from 'dotenv';
 dotenv.config();
 
-module.exports = class FMPCloud {
+import got from 'got';
+import { getRelativeDate } from '../utils';
+
+export default class FMPCloud {
   _baseURL = 'https://fmpcloud.io/api/v3';
   _apiKey = '';
 
-  constructor(apikey = null) {
-    this._apiKey = apikey !== null ? apikey : process.env.FMPCLOUD_API_KEY;
+  constructor(apikey = '') {
+    if (apikey !== '') {
+      this._apiKey = apikey;
+    } else {
+      if (process.env.FMPCLOUD_API_KEY) {
+        this._apiKey = process.env.FMPCLOUD_API_KEY;
+      }
+    }
   }
 
   _formatDateString = (date = Date.now()) => {
@@ -34,7 +40,7 @@ module.exports = class FMPCloud {
     }
   };
 
-  HistoricalEarnings = async (symbol = '', numberOfPriorEarnings = 1) => {
+  HistoricalEarnings = async (symbol: string, numberOfPriorEarnings: number) => {
     try {
       // Since the API expects limit N num of earnings, we use this rough formula of 4 earnings per year
       const l = numberOfPriorEarnings;
@@ -49,8 +55,8 @@ module.exports = class FMPCloud {
       const finalEarnings = earnings.map((e) => {
         const d = new Date(e.date);
         const y = d.getFullYear();
-        const b = getRelativeDate('before', 60, d);
-        const a = getRelativeDate('after', 60, d);
+        const b = getRelativeDate(BeforeOrAfter.before, 60, d);
+        const a = getRelativeDate(BeforeOrAfter.after, 60, d);
         return { year: y, daysBefore: b, daysAfter: a, ...e };
       });
       return finalEarnings;

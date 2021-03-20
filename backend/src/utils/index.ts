@@ -1,8 +1,8 @@
-exports.oneYearAgo = () => {
+export function oneYearAgo() {
   return new Date(new Date().setFullYear(new Date().getFullYear() - 1));
 };
 
-exports.now = () => {
+export function now() {
   return new Date(Date.now());
 };
 
@@ -20,15 +20,10 @@ exports.now = () => {
  * @return  * If "before" or "after" is not used as the value of the `beforeOrAfter`
  * param, we return `null`, otherwise we return a Date object
  */
-exports.getRelativeDate = function (beforeOrAfter, numberOfDays, relativeDate) {
-  // If the `beforeOrAfter param/variable is not either "before" or "after", return `null`
-  if (!['before', 'after'].includes(beforeOrAfter)) {
-    return null;
-  }
-
+export function getRelativeDate(beforeOrAfter: BeforeOrAfter, numberOfDays: number, relativeDate: Date) {
   // If the consumer did not supply a `relativeDate` param, use current Date
   if (!relativeDate) {
-    relativeDate = Date.now();
+    relativeDate = new Date(Date.now());
   }
   // If numberOfDays param not supplied, defalt to 1
   if (!numberOfDays) {
@@ -36,16 +31,16 @@ exports.getRelativeDate = function (beforeOrAfter, numberOfDays, relativeDate) {
   }
 
   const d = new Date(relativeDate);
-  if (beforeOrAfter === 'after') {
+  if (beforeOrAfter === BeforeOrAfter.after) {
     return new Date(d.setDate(d.getDate() + numberOfDays));
   }
-  if (beforeOrAfter === 'before') {
+  if (beforeOrAfter === BeforeOrAfter.before) {
     return new Date(d.setDate(d.getDate() - numberOfDays));
   }
   return null;
 };
 
-exports.getDateAfterDate = (date, daysAfter) => {
+export function getDateAfterDate(date: Date, daysAfter: number) {
   const d = new Date(date);
   return new Date(d.setDate(d.getDate() + daysAfter));
 };
