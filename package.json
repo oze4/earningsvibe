@@ -1,7 +1,7 @@
 {
   "name": "earningsvibe",
   "version": "1.0.0",
-  "main": "build/index.js",
+  "main": "build/backend/index.js",
   "repository": "https://github.com/oze4/earningsvibe.git",
   "author": "Matt Oestreich <matthewpoestreich@gmail.com>",
   "license": "MIT",
@@ -10,6 +10,8 @@
     "start:back": "yarn --cwd backend start",
     "build:front": "yarn --cwd frontend build",
     "build:back": "yarn --cwd backend build",
+    "build": "yarn build:front && yarn build:back",
+    "start": "yarn build && node build/backend/index.js",
     "format": "prettier --write \"**/*.+(js|jsx|json|css|md)\""
   },
   "dependencies": {

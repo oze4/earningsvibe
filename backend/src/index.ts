@@ -1,23 +1,30 @@
+import 'dotenv/config';
 import path from 'path';
-import dotenv from 'dotenv';
-dotenv.config({ path: path.resolve(__dirname, '../../.env') });
-
 import express, { Request, Response } from 'express';
 import helmet from 'helmet';
 
-import FMPCloud from './fmpcloud';
+import FMPCloud from './utils/fmpcloud';
 
-const fmpcloud = new FMPCloud();
+if (!process.env.FMPCLOUD_API_KEY) {
+  throw new Error("Missing FMPCLOUD_API_KEY env var!");
+}
+
+const fmpcloud = new FMPCloud(process.env.FMPCLOUD_API_KEY);
 const app = express();
 const appPort = 8081;
+const frontendRootDirectory = path.resolve(__dirname, '../../build/frontend');
+const staticDirectory = path.join(frontendRootDirectory, '/static'); // path.join(__dirname, path.resolve(frontendRootDirectory, '/static'));
+const staticPathOnDisk = express.static(staticDirectory);
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(helmet());
-app.use('/static', express.static(path.join(__dirname, '../../build/static')));
+
+app.use('/static', staticPathOnDisk);
 
 app.get('/', (_req: Request, res: Response) => {
-  res.sendFile(path.resolve(__dirname, '../../build/index.html'));
+  const html = path.resolve(__dirname, `${frontendRootDirectory}/index.html`);
+  res.sendFile(html);
 });
 
 app.get(

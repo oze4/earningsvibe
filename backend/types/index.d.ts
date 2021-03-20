@@ -1,5 +1,6 @@
 interface StockData {
   date: Date;
+  earningsDate?: Date;
   open: number;
   high: number; // 45.6675;
   low: number; // 44.842499;
@@ -22,6 +23,8 @@ interface EarningsData {
   time: string; // bmo,
   revenue: number; // 0,
   revenueEstimated: number; // 76920700000
+  daysBefore?: Date;
+  daysAfter?: Date;
 }
 
 enum BeforeOrAfter {
@@ -30,7 +33,6 @@ enum BeforeOrAfter {
 }
 
 enum TimePeriod {
-  'OneDay' = '', // one day needs to be empty, thats just how fmpcloud takes it
   'OneMinute' = '1min',
   'FiveMinutes' = '5min',
   'FifteenMinutes' = '15min',
