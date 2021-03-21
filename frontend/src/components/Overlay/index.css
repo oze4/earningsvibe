@@ -32,6 +32,10 @@
   color: #f1f1f1;
 }
 
+.closebtn {
+  cursor: pointer;
+}
+
 .overlay .closebtn {
   position: absolute;
   top: 20px;

@@ -31,13 +31,12 @@ function App() {
     <Container fluid className="pl-0 pr-0 bg-gray">
       <Topbar
         brand="earningsvibe.com"
-        expand="lg"
-        bg="primary"
+        expand="sm"
         searchButtonText="Vibe Check"
         searchPlaceholderText="Ticker"
       />
       <BodyContainer className="mt-2">
-        <Overlay isOpen={overlayOpen} onClose={() => setOverlayOpen(false)}>
+        <Overlay isOpen={overlayOpen} hasCloseButton={false}>
             <Row className="justify-content-center center-me">
               <Col xs>
                 <div className="ml-5 mr-5">

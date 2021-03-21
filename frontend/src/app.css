@@ -3,6 +3,8 @@
   border: 0;
   outline: none;
   background: transparent;
-  border-bottom: 2px solid white;
+  border-bottom: 1rem solid white;
   color: white;
+  font-size: 12rem;
+  text-align: center;
 }
