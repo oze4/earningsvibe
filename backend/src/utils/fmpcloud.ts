@@ -62,10 +62,10 @@ export default class FMPCloud {
       const s = symbol.toUpperCase();
       const u = `${b}/historical/earning_calendar/${s}?limit=${l}&apikey=${a}`;
       const r = await got(u);
-      const earnings = JSON.parse(r.body);
+      const earnings: EarningsData[] = JSON.parse(r.body);
       // Add 'year' prop to each object
       // Changes prop `changePercent` to `percentChange`
-      const finalEarnings = earnings.map((e: EarningsData) => {
+      const finalEarnings = earnings.map((e) => {
         const d = new Date(e.date);
         const y = d.getFullYear();
         const b = getRelativeDate(BeforeOrAfter.before, 60, d);

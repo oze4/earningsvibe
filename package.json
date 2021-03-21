@@ -9,7 +9,7 @@
     "start:front": "yarn --cwd frontend start",
     "start:back": "yarn --cwd backend start",
     "build:front": "yarn --cwd frontend build",
-    "build:back": "yarn --cwd backend build",
+    "build:back": "tsc --project backend/tsconfig.json",
     "build": "yarn build:front && yarn build:back",
     "start": "yarn build && node build/backend/index.js",
     "format": "prettier --write \"**/*.+(js|jsx|json|css|md)\""
