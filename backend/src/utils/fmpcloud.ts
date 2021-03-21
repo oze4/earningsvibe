@@ -1,8 +1,5 @@
-import dotenv from 'dotenv';
 import got from 'got';
 import { getRelativeDate } from '.';
-
-dotenv.config();
 
 /**
  * FMPCloud allows you to interact with the fmpcloud.io API

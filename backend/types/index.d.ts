@@ -27,12 +27,12 @@ interface EarningsData {
   daysAfter?: Date;
 }
 
-enum BeforeOrAfter {
+declare enum BeforeOrAfter {
   before,
   after
 }
 
-enum TimePeriod {
+declare enum TimePeriod {
   'OneMinute' = '1min',
   'FiveMinutes' = '5min',
   'FifteenMinutes' = '15min',
