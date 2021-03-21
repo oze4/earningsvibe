@@ -1,0 +1,8 @@
+.input--fullscreen {
+  width: 100%;
+  border: 0;
+  outline: none;
+  background: transparent;
+  border-bottom: 2px solid white;
+  color: white;
+}
