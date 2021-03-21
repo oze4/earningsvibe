@@ -40,7 +40,7 @@ function App() {
             <Row className="justify-content-center center-me">
               <Col xs>
                 <div className="ml-5 mr-5">
-                  <input type="text" className="input--fullscreen" />
+                  <input placeholder="ticker" type="text" className="input--fullscreen" />
                 </div>
               </Col>
             </Row>
