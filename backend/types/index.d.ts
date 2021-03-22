@@ -27,15 +27,20 @@ interface EarningsData {
   daysAfter?: Date;
 }
 
+interface CustomError {
+  message: string;
+  status: number;
+}
+
 declare enum BeforeOrAfter {
   before,
   after
 }
 
 declare enum TimePeriod {
-  'OneMinute' = '1min',
-  'FiveMinutes' = '5min',
-  'FifteenMinutes' = '15min',
-  'ThirtyMinutes' = '30min',
-  'OneHour' = '1hour'
+  '1min' = '1min',
+  '5min' = '5min',
+  '15min' = '15min',
+  '30min' = '30min',
+  '1hour' = '1hour'
 }

@@ -90,7 +90,7 @@ export default class FMPCloud {
     symbol: string,
     startDate: Date = new Date(Date.now()),
     endDate: Date = new Date(Date.now()),
-    timePeriod: TimePeriod = TimePeriod.OneHour
+    timePeriod: TimePeriod = TimePeriod["1hour"]
   ) => {
     try {
       const b = this.#baseURL;

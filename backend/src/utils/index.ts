@@ -1,3 +1,6 @@
+export { default as NewHTTPError } from './errors';
+export { default as FMPCloud } from './fmpcloud';
+
 export function oneYearAgo() {
   return new Date(new Date().setFullYear(new Date().getFullYear() - 1));
 };

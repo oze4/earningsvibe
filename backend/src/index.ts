@@ -4,7 +4,7 @@ import 'dotenv/config';
 import path from 'path';
 import express, { Request, Response } from 'express';
 import helmet from 'helmet';
-import FMPCloud from './utils/fmpcloud';
+import { FMPCloud, NewHTTPError } from './utils';
 
 if (!process.env.FMPCLOUD_API_KEY) {
   throw new Error('Missing FMPCLOUD_API_KEY env var!');
@@ -31,23 +31,40 @@ app.get('/', (_req: Request, res: Response) => {
 
 /**
  * Query Params: (* means required)
- *   - * symbol = ticker symbol
  *   - * to = start date (in YYYY-MM-DD format)
  *   - * from = end date (in YYYY-MM-DD format)
- *   - timePeriod = length of time for each candle. must be one of: ("1min"|"5min"|"15min"|"30min"|"1hour"). defaults to "1hour".
+ *   - time_period = length of time for each candle. must be one of: ("1min"|"5min"|"15min"|"30min"|"1hour"). defaults to "1hour".
  */
-app.get('/api/stock_data', async (req: Request, res: Response) => {
+app.get('/api/:symbol/stock_data', async (req: Request, res: Response) => {
   try {
-    const { symbol, years_ago } = req.params;
-    // const data = await fmpcloud.VibeCheck(String(symbol).toUpperCase(), years_ago);
-    // if (!symbol || !years_ago) {
-    //   res.status(404).send({ status: 400, response: 'Incorrect parameters' })
-    // }
-    const data = await fmpcloud.HistoricalEarnings(symbol, Number(years_ago));
-    res.status(200).send(data);
+    const { to = '', from = '', time_period = '1hour' } = req.query;
+    const { symbol } = req.params;
+
+    // Validate to and from query params were provided
+    if (!to || !from) {
+      res.status(404).send(
+        NewHTTPError(
+          404,
+          `missing query param : ${
+            // If 'to' but not 'from' was given, put "from" in the error msg.
+            // If 'from' but not 'to' was given, put "to" inthe error msg.
+            // If neither were provided, put both in error msg.
+            to && !from ? '"from"' : from && !to ? '"to"' : '"to" and "from"'
+          }`
+        )
+      );
+    }
+
+    // Validate 'time_period' param is acceptable
+    if (time_period in TimePeriod === false) {
+      res.status(404).send(NewHTTPError(404, `time period '${time_period}' is not allowed`));
+    }
+    const tp = time_period as TimePeriod;
+    const resp = await fmpcloud.HistoricalStock(symbol, new Date(from.toString()), new Date(to.toString()), tp);
+    // TODO : finish this - Need to finish building out the fmpcloud class as well
   } catch (e) {
     console.log(e);
-    res.status(500).send(null);
+    res.status(500).send(NewHTTPError(500, e));
   }
 });
 
