@@ -5,6 +5,10 @@ import path from 'path';
 import express, { Request, Response } from 'express';
 import helmet from 'helmet';
 import { FMPCloud, NewHTTPError } from './utils';
+import {
+  ValidateTimePeriod,
+  ValidateToAndFromQueryParams
+} from './middlewares';
 
 if (!process.env.FMPCLOUD_API_KEY) {
   throw new Error('Missing FMPCLOUD_API_KEY env var!');
@@ -19,7 +23,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(helmet());
 
 const frontendRootDirectory = path.resolve(__dirname, '../../build/frontend');
-const staticDirectory = path.join(frontendRootDirectory, '/static'); // path.join(__dirname, path.resolve(frontendRootDirectory, '/static'));
+const staticDirectory = path.join(frontendRootDirectory, '/static');
 const staticPathOnDisk = express.static(staticDirectory);
 
 app.use('/static', staticPathOnDisk);
@@ -35,38 +39,30 @@ app.get('/', (_req: Request, res: Response) => {
  *   - * from = end date (in YYYY-MM-DD format)
  *   - time_period = length of time for each candle. must be one of: ("1min"|"5min"|"15min"|"30min"|"1hour"). defaults to "1hour".
  */
-app.get('/api/:symbol/stock_data', async (req: Request, res: Response) => {
-  try {
-    const { to = '', from = '', time_period = '1hour' } = req.query;
-    const { symbol } = req.params;
+app.get(
+  '/api/:symbol/stock_data',
+  [ValidateTimePeriod, ValidateToAndFromQueryParams],
+  async (req: Request, res: Response) => {
+    try {
+      const { symbol } = req.params;
+      const { to = '', from = '', time_period = '1hour' } = req.query;
 
-    // Validate to and from query params were provided
-    if (!to || !from) {
-      res.status(404).send(
-        NewHTTPError(
-          404,
-          `missing query param : ${
-            // If 'to' but not 'from' was given, put "from" in the error msg.
-            // If 'from' but not 'to' was given, put "to" inthe error msg.
-            // If neither were provided, put both in error msg.
-            to && !from ? '"from"' : from && !to ? '"to"' : '"to" and "from"'
-          }`
-        )
-      );
-    }
+      const tp = time_period as TimePeriod;
+      const fromDate = new Date(from.toString());
+      const toDate = new Date(to.toString());
+      
+      console.log({ tp });
 
-    // Validate 'time_period' param is acceptable
-    if (time_period in TimePeriod === false) {
-      res.status(404).send(NewHTTPError(404, `time period '${time_period}' is not allowed`));
+      //* Get data from fmpcloud.io
+      const resp = await fmpcloud.HistoricalStock(symbol, fromDate, toDate, tp);
+
+      // TODO : finish this - Need to finish building out the fmpcloud class as well
+    } catch (e) {
+      console.log(e);
+      res.status(500).send(NewHTTPError(500, e));
     }
-    const tp = time_period as TimePeriod;
-    const resp = await fmpcloud.HistoricalStock(symbol, new Date(from.toString()), new Date(to.toString()), tp);
-    // TODO : finish this - Need to finish building out the fmpcloud class as well
-  } catch (e) {
-    console.log(e);
-    res.status(500).send(NewHTTPError(500, e));
   }
-});
+);
 
 app.get('*', (_req: Request, res: Response) => {
   res.status(404).send({ response: null, status: 404 });
