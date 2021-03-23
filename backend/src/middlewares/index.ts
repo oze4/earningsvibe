@@ -41,12 +41,10 @@ export function ValidateToAndFromQueryParams(
   const { to, from } = req.query;
   if (!to || !from) {
     // Sort out which param is missing for our error message.
-    let missingParam = '"to" and "from"';
-    if (to && !from) {
-      missingParam = '"from"';
-    } else if (from && !to) {
+    let missingParam = '"from"';
+    if (from && !to) {
       missingParam = '"to"';
-    }
+    } 
     const err = NewHTTPError(404, `missing query param : ${missingParam}`);
     res.status(404).send(err);
   }
