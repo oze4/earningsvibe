@@ -46,7 +46,7 @@ app.get('/api/stock_data/:symbol', async (req: Request, res: Response) => {
   try {
     const { symbol } = req.params;
     const { to = '', from = '', time_period = '1hour' } = req.query;
-    const tp = time_period as TimePeriod;
+    const tp = time_period as unknown as TimePeriod;
     const fromDate = new Date(from.toString());
     const toDate = new Date(to.toString());
     console.log({ tp });

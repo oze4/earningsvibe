@@ -42,9 +42,9 @@ declare enum BeforeOrAfter {
 }
 
 declare enum TimePeriod {
-  '1min' = '1min',
-  '5min' = '5min',
-  '15min' = '15min',
-  '30min' = '30min',
-  '1hour' = '1hour'
+  '1min', // = '1min',
+  '5min', // = '5min',
+  '15min', // = '15min',
+  '30min', // = '30min',
+  '1hour', // = '1hour'
 }
