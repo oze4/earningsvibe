@@ -80,7 +80,7 @@ export default class FMPCloud {
   };
 
   /**
-   * Get historical stock info
+   * Get historical stock info.    
    * @param {string} symbol stock ticker symbol
    * @param {Date} startDate starting date range
    * @param {Date} endDate ending date range
@@ -93,27 +93,17 @@ export default class FMPCloud {
     timePeriod: TimePeriod = TimePeriod["1hour"]
   ) => {
     try {
+      if (timePeriod in TimePeriod === false) {
+        throw new Error("Invalid time period");
+      }
       const b = this.#baseURL;
       const a = this.#apiKey;
+      const t = timePeriod.toString();
       const s = this._formatDateString(startDate);
       const e = this._formatDateString(endDate);
-      console.log(timePeriod.toString());
-      const url = `${b}/historical-chart/${timePeriod.toString()}/${symbol}?from=${s}&to=${e}&apikey=${a}`;
+      const url = `${b}/historical-chart/${t}/${symbol}?from=${s}&to=${e}&apikey=${a}`; // `${b}/historical-chart/${timePeriod.toString()}/${symbol}?from=${s}&to=${e}&apikey=${a}`;
       const res = await got(url);
-      const json = JSON.parse(res.body);
-
-      return (
-        json.historical &&
-        json.historical.length &&
-        json.historical.map((h: StockData) => {
-          const c = {
-            ...h,
-            percentChange: h.changePercent, //  rename changePercent to percentChange
-            date: new Date(h.date)
-          };
-          return { ...c }; // combine metadata with final object
-        })
-      );
+      return JSON.parse(res.body) as StockData[];
     } catch (err) {
       console.log(`Error : [HistoricalStock] : ${err}`);
       throw err;

@@ -1,0 +1,8 @@
+{
+  "watch": ["backend/src", "build"],
+  "ext": "js, ts",
+  "events": {
+    "restart": "yarn build:back"
+  },
+  "ignore": ["build"]
+}

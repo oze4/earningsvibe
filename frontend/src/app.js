@@ -1,12 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import { Container, Col, Row, Spinner } from 'react-bootstrap';
+import React, { useState } from 'react';
+import { Container, Col, Row } from 'react-bootstrap';
 
 import {
   Topbar,
   BodyContainer,
-  SearchForm,
-  AlertToast,
-  CandleStickChartWithMA,
   Overlay
 } from './components';
 
@@ -38,10 +35,8 @@ function App() {
       <BodyContainer className="mt-2">
         <Overlay isOpen={overlayOpen} hasCloseButton={false}>
             <Row className="justify-content-center center-me">
-              <Col xs>
-                <div className="ml-5 mr-5">
+              <Col xs className="ml-5 mr-5">
                   <input placeholder="ticker" type="text" className="input--fullscreen" />
-                </div>
               </Col>
             </Row>
         </Overlay>
