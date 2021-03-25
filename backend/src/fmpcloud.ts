@@ -70,7 +70,7 @@ export default class FMPCloud {
       const s = symbol.toUpperCase();
       const u = `${b}/historical/earning_calendar/${s}?limit=${l}&apikey=${a}`;
       const r = await got(u);
-      let earnings: EarningsData[] = JSON.parse(r.body).filter(
+      const earnings: EarningsData[] = JSON.parse(r.body).filter(
         // fmpcloud.io gives us the next upcoming earnings data, which is empty, because it hasn't come yet. So we don't care about it.
         (e: EarningsData) => new Date(e.date) < new Date(Date.now())
       );
