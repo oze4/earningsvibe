@@ -117,5 +117,3 @@ export default class FMPCloud {
     }
   };
 }
-
-// https://fmpcloud.io/api/v3/historical-chart/1min/AAPL?apikey=122adca11c8c872b7f543bebbb4d0afe
