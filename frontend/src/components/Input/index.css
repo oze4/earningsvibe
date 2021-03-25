@@ -1,0 +1,89 @@
+@media screen and (max-width: 480px) {
+  .input--fullscreen {
+    font-size: 8rem !important;
+    border-bottom: 0.5rem solid white !important;
+  }
+}
+
+@media screen and (max-width: 400px) {
+  .input--fullscreen {
+    font-size: 6rem !important;
+    border-bottom: 0.5rem solid white im !important;
+  }
+}
+
+.input--fullscreen {
+  width: 100%;
+  border: 0;
+  outline: none;
+  background: transparent;
+  border-bottom: 1rem solid white;
+  color: white;
+  font-size: 12rem;
+  line-height: 1;
+  text-align: left;
+}
+
+.input--fullscreen:focus::placeholder {
+  color: transparent;
+}
+
+.container {
+  margin: auto;
+  max-width: 800px;
+  margin-top: 150px;
+}
+
+.inputcontainer {
+  position: relative;
+}
+
+input {
+  width: 100%;
+  font-size: 20px;
+  box-sizing: border-box;
+}
+
+.icon-container {
+  position: absolute;
+  right: 10px;
+  top: calc(50% - 10px);
+}
+.loader {
+  position: relative;
+  height: 20px;
+  width: 20px;
+  display: inline-block;
+  animation: around 5.4s infinite;
+}
+
+@keyframes around {
+  0% {
+    transform: rotate(0deg)
+  }
+  100% {
+    transform: rotate(360deg)
+  }
+}
+
+.loader::after, .loader::before {
+  content: "";
+  background: white;
+  position: absolute;
+  display: inline-block;
+  width: 100%;
+  height: 100%;
+  border-width: 2px;
+  border-color: #333 #333 transparent transparent;
+  border-style: solid;
+  border-radius: 20px;
+  box-sizing: border-box;
+  top: 0;
+  left: 0;
+  animation: around 0.7s ease-in-out infinite;
+}
+
+.loader::after {
+  animation: around 0.7s ease-in-out 0.1s infinite;
+  background: transparent;
+}

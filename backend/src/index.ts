@@ -56,8 +56,7 @@ app.get(
  * Route Example:
  * /api/earnings_data/tsla?count=10
  *
- * The example above does:
- *  - will get 10 prior earnings reports
+ * The example above will get 10 prior earnings reports.
  *
  * Notes:
  *  - If no count query param is proided, we default to 4 prior earnings (typically ~1 years worth)
@@ -71,6 +70,26 @@ app.get('/api/earnings_data/:symbol', async (req: Request, res: Response) => {
   } catch (e) {
     console.log(e);
     res.status(500).send(NewHTTPError(500, e));
+  }
+});
+
+/**
+ * Route Example:
+ * /api/vibe_check?symbol=tsla&count=10
+ * 
+ * The example above will vibe check the previous 10 earnings
+ * 
+ * Notes:
+ *  - If no count query param is proided, we default to 4 prior earnings (typically ~1 years worth)
+ */
+app.get('/api/vibe_check', async (req, res) => {
+  try {
+    const { symbol = '', count = 4 } = req.query;
+    const data = await fmpcloud.VibeCheck(symbol.toString(), Number(count));
+    res.status(200).send(data);
+  } catch (e) {
+    console.log(e);
+    res.status(500).send(NewHTTPError(500, e)); 
   }
 });
 

@@ -1,29 +1,30 @@
 import React, { useState } from 'react';
 import { Container, Col, Row } from 'react-bootstrap';
 
-import { Topbar, BodyContainer, Overlay } from './components';
-
-import './app.css';
+import { Topbar, BodyContainer, Overlay, Input } from './components';
 
 function App() {
-  const [stockData, setStockData] = useState(undefined);
+  const [Stock, setStock] = useState(undefined);
   const [overlayOpen, setOverlayOpen] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleOnSubmit = async (event, formdata) => {
-    if (!formdata.ticker || !formdata.yearsAgo) {
-      console.error('All fields are required!');
-    }
+  const handleOnSubmit = async (event) => {
     const resp = await fetch(
-      `/api/vibe_check/${formdata.ticker}/${formdata.yearsAgo}`
+      // Defaults to one years worth (typically) of earnings
+      `/api/vibe_check?symbol=${event.target.value}&count=4`
     );
     const json = await resp.json();
-    setStockData(json);
+    setStock(json);
   };
 
-  const handleOnKeyPress = (event) => {
+  const handleOnKeyPress = async (event) => {
     if (event.key === 'Enter') {
+      setIsLoading(true);
       event.preventDefault();
-      // TODO : handle submit ticker for earnings vibe
+      // await handleOnSubmit(event);
+      const sleep = (ms) => new Promise(r => setTimeout(r, ms));
+      await sleep(4000);
+      setIsLoading(false);
     }
   };
 
@@ -39,10 +40,16 @@ function App() {
         />
       )}
       <BodyContainer className="mt-2">
+        {!overlayOpen && (
+          <div>
+            <h1>I am the body</h1>
+          </div>
+        )}
         <Overlay isOpen={overlayOpen} hasCloseButton={false}>
           <Row className="justify-content-center center-me">
             <Col xs className="ml-5 mr-5">
-              <input
+              <Input
+                isLoading={isLoading}
                 placeholder="ticker"
                 type="text"
                 className="input--fullscreen"

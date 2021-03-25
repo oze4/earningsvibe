@@ -1,4 +1,4 @@
-export interface StockData {
+export interface Stock {
   // Optional
   adjClose?: number;
   change?: number;
@@ -17,7 +17,7 @@ export interface StockData {
   volume: number;
 }
 
-export interface EarningsData {
+export interface Earnings {
   // Optional
   daysBefore?: Date;
   daysAfter?: Date;
@@ -29,6 +29,11 @@ export interface EarningsData {
   revenueEstimated: number;
   symbol: string;
   time: string;
+}
+
+export interface EarningsVibe {
+  earnings: Earnings;
+  stock: Stock[];
 }
 
 export interface CustomError {

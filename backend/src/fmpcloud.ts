@@ -1,5 +1,11 @@
 import got from 'got';
-import { EarningsData, BeforeOrAfter, StockData, TimePeriod } from './types';
+import {
+  Earnings,
+  BeforeOrAfter,
+  Stock,
+  TimePeriod,
+  EarningsVibe
+} from './types';
 import { getRelativeDate } from './utils';
 
 /**
@@ -20,13 +26,13 @@ export default class FMPCloud {
    * Formats a date to YYYY-MM-DD
    * @param {Date} date date to format
    */
-  _formatDateString = (date: Date = new Date(Date.now())) => {
+  _formatDateString = (date = new Date(Date.now())) => {
     const x = new Date(date);
     const year = x.getFullYear();
     // need a 2 digit month
     let month = String(x.getMonth() + 1);
     if (month.length === 1) {
-      month = '0' + month; 
+      month = '0' + month;
     }
     // need a 2 digit day
     let day = String(x.getDate());
@@ -70,9 +76,9 @@ export default class FMPCloud {
       const s = symbol.toUpperCase();
       const u = `${b}/historical/earning_calendar/${s}?limit=${l}&apikey=${a}`;
       const r = await got(u);
-      const earnings: EarningsData[] = JSON.parse(r.body).filter(
+      const earnings: Earnings[] = JSON.parse(r.body).filter(
         // fmpcloud.io gives us the next upcoming earnings data, which is empty, because it hasn't come yet. So we don't care about it.
-        (e: EarningsData) => new Date(e.date) < new Date(Date.now())
+        (e: Earnings) => new Date(e.date) < new Date(Date.now())
       );
       return earnings.map((e) => {
         const d = new Date(e.date);
@@ -97,9 +103,9 @@ export default class FMPCloud {
    */
   HistoricalStock = async (
     symbol: string,
-    startDate: Date = new Date(Date.now()),
-    endDate: Date = new Date(Date.now()),
-    timePeriod: TimePeriod = TimePeriod['1hour']
+    startDate = new Date(Date.now()),
+    endDate = new Date(Date.now()),
+    timePeriod = TimePeriod['1hour']
   ) => {
     try {
       if (timePeriod in TimePeriod === false) {
@@ -112,10 +118,14 @@ export default class FMPCloud {
       const e = this._formatDateString(endDate);
       const url = `${b}/historical-chart/${t}/${symbol.toUpperCase()}?from=${s}&to=${e}&apikey=${a}`;
       const res = await got(url);
-      return JSON.parse(res.body) as StockData[];
+      return JSON.parse(res.body) as Stock[];
     } catch (err) {
       console.log(`Error : [HistoricalStock] : ${err}`);
       throw err;
     }
+  };
+
+  VibeCheck = (symbol: string, count = 4): EarningsVibe[] => {
+    return [];
   };
 }
