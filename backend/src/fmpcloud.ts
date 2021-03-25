@@ -23,10 +23,12 @@ export default class FMPCloud {
   _formatDateString = (date: Date = new Date(Date.now())) => {
     const x = new Date(date);
     const year = x.getFullYear();
+    // need a 2 digit month
     let month = String(x.getMonth() + 1);
     if (month.length === 1) {
-      month = '0' + month; // need a 2 digit month
+      month = '0' + month; 
     }
+    // need a 2 digit day
     let day = String(x.getDate());
     if (day.length === 1) {
       day = '0' + day;
@@ -69,11 +71,9 @@ export default class FMPCloud {
       const u = `${b}/historical/earning_calendar/${s}?limit=${l}&apikey=${a}`;
       const r = await got(u);
       let earnings: EarningsData[] = JSON.parse(r.body).filter(
-        // fmpcloud.io gives us the next earnings date, which hasn't come yet, so we don't care about it
+        // fmpcloud.io gives us the next upcoming earnings data, which is empty, because it hasn't come yet. So we don't care about it.
         (e: EarningsData) => new Date(e.date) < new Date(Date.now())
       );
-      // Add 'year' prop to each object
-      // Changes prop `changePercent` to `percentChange`
       return earnings.map((e) => {
         const d = new Date(e.date);
         const y = d.getFullYear();
