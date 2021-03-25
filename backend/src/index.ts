@@ -30,15 +30,7 @@ app.get('/', (_req: Request, res: Response) => {
 });
 
 /**
- * Query Params:
- *   + to : [required]
- *       start date (in YYYY-MM-DD format)
- *   + from : [required]
- *       end date (in YYYY-MM-DD format)
- *   + time_period : [defaults to '1hour']
- *       length of time for each candle. must be one of: ("1min"|"5min"|"15min"|"30min"|"1hour"). defaults to "1hour".
- *
- * Example:
+ * Route Example:
  * /api/stock_data/tsla?from=2021-01-01-31&to=2021-02-15&time_period=15min
  */
 app.get(
@@ -59,6 +51,28 @@ app.get(
     }
   }
 );
+
+/**
+ * Route Example:
+ * /api/earnings_data/tsla?count=10
+ *
+ * The example above does:
+ *  - will get 10 prior earnings reports
+ *
+ * Notes:
+ *  - If no count query param is proided, we default to 4 prior earnings (typically ~1 years worth)
+ */
+app.get('/api/earnings_data/:symbol', async (req: Request, res: Response) => {
+  try {
+    const { symbol } = req.params;
+    const { count = 4 } = req.query;
+    const data = await fmpcloud.HistoricalEarnings(symbol.toUpperCase(), Number(count));
+    res.status(200).send(data);
+  } catch (e) {
+    console.log(e);
+    res.status(500).send(NewHTTPError(500, e));
+  }
+});
 
 app.get('*', (_req: Request, res: Response) => {
   res.status(404).send({ response: null, status: 404 });

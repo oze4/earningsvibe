@@ -23,7 +23,7 @@ export default class FMPCloud {
   _formatDateString = (date: Date = new Date(Date.now())) => {
     const x = new Date(date);
     const year = x.getFullYear();
-    let month = String(x.getMonth() + 1)
+    let month = String(x.getMonth() + 1);
     if (month.length === 1) {
       month = '0' + month; // need a 2 digit month
     }
@@ -68,16 +68,20 @@ export default class FMPCloud {
       const s = symbol.toUpperCase();
       const u = `${b}/historical/earning_calendar/${s}?limit=${l}&apikey=${a}`;
       const r = await got(u);
-      const earnings: EarningsData[] = JSON.parse(r.body);
-      // Adds metadata so we don't have to do these calculations client-side.
-      const finalEarnings = earnings.map((e) => {
+      let earnings: EarningsData[] = JSON.parse(r.body).filter(
+        // fmpcloud.io gives us the next earnings date, which hasn't come yet, so we don't care about it
+        (e: EarningsData) => new Date(e.date) < new Date(Date.now())
+      );
+      // Add 'year' prop to each object
+      // Changes prop `changePercent` to `percentChange`
+      return earnings.map((e) => {
         const d = new Date(e.date);
         const y = d.getFullYear();
         const b = getRelativeDate(BeforeOrAfter.before, 60, d);
         const a = getRelativeDate(BeforeOrAfter.after, 60, d);
-        return { year: y, daysBefore: b, daysAfter: a, ...e };
+        const _meta = { year: y, daysBefore: b, daysAfter: a };
+        return { ...e, _meta };
       });
-      return finalEarnings;
     } catch (e) {
       console.log('Error : HistoricalEarnings : ', e);
       throw e;
@@ -85,7 +89,7 @@ export default class FMPCloud {
   };
 
   /**
-   * Get historical stock info.    
+   * Get historical stock info.
    * @param {string} symbol stock ticker symbol
    * @param {Date} startDate starting date range
    * @param {Date} endDate ending date range
@@ -95,11 +99,11 @@ export default class FMPCloud {
     symbol: string,
     startDate: Date = new Date(Date.now()),
     endDate: Date = new Date(Date.now()),
-    timePeriod: TimePeriod = TimePeriod["1hour"]
+    timePeriod: TimePeriod = TimePeriod['1hour']
   ) => {
     try {
       if (timePeriod in TimePeriod === false) {
-        throw new Error("Invalid time period");
+        throw new Error('Invalid time period');
       }
       const b = this.#baseURL;
       const a = this.#apiKey;
