@@ -1,11 +1,7 @@
 import React, { useState } from 'react';
 import { Container, Col, Row } from 'react-bootstrap';
 
-import {
-  Topbar,
-  BodyContainer,
-  Overlay
-} from './components';
+import { Topbar, BodyContainer, Overlay } from './components';
 
 import './app.css';
 
@@ -24,21 +20,36 @@ function App() {
     setStockData(json);
   };
 
+  const handleOnKeyPress = (event) => {
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      // TODO : handle submit ticker for earnings vibe
+    }
+  };
+
   return (
     <Container fluid className="pl-0 pr-0 bg-gray">
-      <Topbar
-        brand="earningsvibe.com"
-        expand="sm"
-        searchButtonText="Vibe Check"
-        searchPlaceholderText="Ticker"
-      />
+      {/* If the overlay is open, don't show anything behind it */}
+      {!overlayOpen && (
+        <Topbar
+          brand="earningsvibe.com"
+          expand="sm"
+          searchButtonText="Vibe Check"
+          searchPlaceholderText="Ticker"
+        />
+      )}
       <BodyContainer className="mt-2">
         <Overlay isOpen={overlayOpen} hasCloseButton={false}>
-            <Row className="justify-content-center center-me">
-              <Col xs className="ml-5 mr-5">
-                  <input placeholder="ticker" type="text" className="input--fullscreen" />
-              </Col>
-            </Row>
+          <Row className="justify-content-center center-me">
+            <Col xs className="ml-5 mr-5">
+              <input
+                placeholder="ticker"
+                type="text"
+                className="input--fullscreen"
+                onKeyPress={(e) => handleOnKeyPress(e)}
+              />
+            </Col>
+          </Row>
         </Overlay>
       </BodyContainer>
     </Container>

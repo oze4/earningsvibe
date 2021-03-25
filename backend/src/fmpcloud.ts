@@ -1,5 +1,6 @@
 import got from 'got';
-import { getRelativeDate } from '.';
+import { EarningsData, BeforeOrAfter, StockData, TimePeriod } from './types';
+import { getRelativeDate } from './utils';
 
 /**
  * FMPCloud allows you to interact with the fmpcloud.io API
@@ -22,8 +23,14 @@ export default class FMPCloud {
   _formatDateString = (date: Date = new Date(Date.now())) => {
     const x = new Date(date);
     const year = x.getFullYear();
-    const month = x.getMonth() + 1;
-    const day = x.getDate();
+    let month = String(x.getMonth() + 1)
+    if (month.length === 1) {
+      month = '0' + month; // need a 2 digit month
+    }
+    let day = String(x.getDate());
+    if (day.length === 1) {
+      day = '0' + day;
+    }
     return `${year}-${month}-${day}`;
   };
 
@@ -101,7 +108,7 @@ export default class FMPCloud {
       const t = timePeriod.toString();
       const s = this._formatDateString(startDate);
       const e = this._formatDateString(endDate);
-      const url = `${b}/historical-chart/${t}/${symbol}?from=${s}&to=${e}&apikey=${a}`; // `${b}/historical-chart/${timePeriod.toString()}/${symbol}?from=${s}&to=${e}&apikey=${a}`;
+      const url = `${b}/historical-chart/${t}/${symbol.toUpperCase()}?from=${s}&to=${e}&apikey=${a}`;
       const res = await got(url);
       return JSON.parse(res.body) as StockData[];
     } catch (err) {
@@ -110,3 +117,5 @@ export default class FMPCloud {
     }
   };
 }
+
+// https://fmpcloud.io/api/v3/historical-chart/1min/AAPL?apikey=122adca11c8c872b7f543bebbb4d0afe

@@ -1,12 +1,14 @@
 @media screen and (max-width: 480px) {
   .input--fullscreen {
     font-size: 8rem !important;
+    border-bottom: 0.5rem solid white !important;
   }
 }
 
 @media screen and (max-width: 400px) {
   .input--fullscreen {
     font-size: 6rem !important;
+    border-bottom: 0.5rem solid white im !important;
   }
 }
 

@@ -1,10 +1,11 @@
-/// <reference path="../types/index.d.ts" />
-
 import 'dotenv/config';
 import path from 'path';
 import express, { Request, Response } from 'express';
 import helmet from 'helmet';
-import { FMPCloud, NewHTTPError, ValidateTimePeriod, ValidateToAndFromQueryParams } from './utils';
+import { ValidateTimePeriod, ValidateToAndFromQueryParams } from './middleware';
+import { TimePeriod } from './types';
+import FMPCloud from './fmpcloud'
+import { NewHTTPError } from './errors'; 
 
 if (!process.env.FMPCLOUD_API_KEY) {
   throw new Error('Missing FMPCLOUD_API_KEY env var!');
@@ -49,8 +50,7 @@ app.get('/api/stock_data/:symbol', async (req: Request, res: Response) => {
     const tp = time_period as unknown as TimePeriod;
     const fromDate = new Date(from.toString());
     const toDate = new Date(to.toString());
-    console.log({ tp });
-    const data = await fmpcloud.HistoricalStock(symbol, fromDate, toDate, tp);
+    const data = await fmpcloud.HistoricalStock(symbol, fromDate, toDate, tp)
     res.status(200).send(data);
   } catch (e) {
     console.log(e);

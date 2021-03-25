@@ -1,4 +1,4 @@
-interface StockData {
+export interface StockData {
   // Optional
   adjClose?: number;
   change?: number;
@@ -17,7 +17,7 @@ interface StockData {
   volume: number;
 }
 
-interface EarningsData {
+export interface EarningsData {
   // Optional
   daysBefore?: Date;
   daysAfter?: Date;
@@ -31,17 +31,17 @@ interface EarningsData {
   time: string;
 }
 
-interface CustomError {
+export interface CustomError {
   message: string;
   status: number;
 }
 
-declare enum BeforeOrAfter {
+export enum BeforeOrAfter {
   before,
   after
 }
 
-declare enum TimePeriod {
+export enum TimePeriod {
   '1min', // = '1min',
   '5min', // = '5min',
   '15min', // = '15min',

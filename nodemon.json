@@ -2,7 +2,7 @@
   "watch": ["backend/src", "build"],
   "ext": "js, ts",
   "events": {
-    "restart": "yarn build:back"
+    "restart": "yarn build:back && echo 'done building backend'"
   },
   "ignore": ["build"]
 }
