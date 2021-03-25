@@ -1,4 +1,4 @@
-import { Request, Response } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import { TimePeriod } from './types';
 import { NewHTTPError } from './errors';
 
@@ -6,11 +6,13 @@ import { NewHTTPError } from './errors';
  * Validates time period. If invalid, we send a response with appropriate error.
  * @param {Express.Request} req
  * @param {Express.Response} res
+ * @param {Express.NextFunction} next
  * @returns {void}
  */
  export function ValidateTimePeriod(
   req: Request,
-  res: Response
+  res: Response,
+  next: NextFunction
 ): void {
   const { time_period = '1hour' } = req.query;
   const h = 404; // http status : TODO : prob needs to be changed to like 5xx ?
@@ -20,6 +22,7 @@ import { NewHTTPError } from './errors';
     const e = NewHTTPError(h, m);
     res.status(h).send(e);
   }
+  next();
 }
 
 /**
@@ -32,7 +35,8 @@ import { NewHTTPError } from './errors';
  */
 export function ValidateToAndFromQueryParams(
   req: Request,
-  res: Response
+  res: Response,
+  next: NextFunction
 ): void {
   const { to, from } = req.query;
   if (!to || !from) {
@@ -44,4 +48,5 @@ export function ValidateToAndFromQueryParams(
     const err = NewHTTPError(404, `missing query param : ${missingParam}`);
     res.status(404).send(err);
   }
+  next();
 }

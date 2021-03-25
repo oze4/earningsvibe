@@ -4,8 +4,8 @@ import express, { Request, Response } from 'express';
 import helmet from 'helmet';
 import { ValidateTimePeriod, ValidateToAndFromQueryParams } from './middleware';
 import { TimePeriod } from './types';
-import FMPCloud from './fmpcloud'
-import { NewHTTPError } from './errors'; 
+import FMPCloud from './fmpcloud';
+import { NewHTTPError } from './errors';
 
 if (!process.env.FMPCLOUD_API_KEY) {
   throw new Error('Missing FMPCLOUD_API_KEY env var!');
@@ -41,22 +41,24 @@ app.get('/', (_req: Request, res: Response) => {
  * Example:
  * /api/stock_data/tsla?from=2021-01-01-31&to=2021-02-15&time_period=15min
  */
-app.get('/api/stock_data/:symbol', async (req: Request, res: Response) => {
-  ValidateTimePeriod(req, res);
-  ValidateToAndFromQueryParams(req, res);
-  try {
-    const { symbol } = req.params;
-    const { to = '', from = '', time_period = '1hour' } = req.query;
-    const tp = time_period as unknown as TimePeriod;
-    const fromDate = new Date(from.toString());
-    const toDate = new Date(to.toString());
-    const data = await fmpcloud.HistoricalStock(symbol, fromDate, toDate, tp)
-    res.status(200).send(data);
-  } catch (e) {
-    console.log(e);
-    res.status(500).send(NewHTTPError(500, e));
+app.get(
+  '/api/stock_data/:symbol',
+  [ValidateTimePeriod, ValidateToAndFromQueryParams],
+  async (req: Request, res: Response) => {
+    try {
+      const { symbol } = req.params;
+      const { to = '', from = '', time_period = '1hour' } = req.query;
+      const tp = (time_period as unknown) as TimePeriod;
+      const fromDate = new Date(from.toString());
+      const toDate = new Date(to.toString());
+      const data = await fmpcloud.HistoricalStock(symbol, fromDate, toDate, tp);
+      res.status(200).send(data);
+    } catch (e) {
+      console.log(e);
+      res.status(500).send(NewHTTPError(500, e));
+    }
   }
-});
+);
 
 app.get('*', (_req: Request, res: Response) => {
   res.status(404).send({ response: null, status: 404 });
