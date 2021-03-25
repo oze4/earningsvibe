@@ -62,7 +62,6 @@ export default class FMPCloud {
     numberOfPriorEarnings: number
   ) => {
     try {
-      // Since the API expects limit N num of earnings, we use this rough formula of 4 earnings per year
       const l = numberOfPriorEarnings;
       const b = this.#baseURL;
       const a = this.#apiKey;
@@ -70,8 +69,7 @@ export default class FMPCloud {
       const u = `${b}/historical/earning_calendar/${s}?limit=${l}&apikey=${a}`;
       const r = await got(u);
       const earnings: EarningsData[] = JSON.parse(r.body);
-      // Add 'year' prop to each object
-      // Changes prop `changePercent` to `percentChange`
+      // Adds metadata so we don't have to do these calculations client-side.
       const finalEarnings = earnings.map((e) => {
         const d = new Date(e.date);
         const y = d.getFullYear();
