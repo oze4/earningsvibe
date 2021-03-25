@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { TimePeriod } from './types';
 import { NewHTTPError } from './errors';
+
 /**
  * Validates time period. If invalid, we send a response with appropriate error.
  * @param {Express.Request} req
