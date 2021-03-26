@@ -1,5 +1,4 @@
 export interface Stock {
-  // Optional
   adjClose?: number;
   change?: number;
   changeOverTime?: number;
@@ -8,13 +7,13 @@ export interface Stock {
   label?: string; 
   unadjustedVolume?: number;
   vwap?: number;
-  // Required
-  close: number; 
-  date: Date;
-  low: number; 
-  open: number;
-  high: number;
-  volume: number;
+  // "Main" props returned by fmpcloud.io for charting
+  close?: number; 
+  date?: Date;
+  low?: number; 
+  open?: number;
+  high?: number;
+  volume?: number;
 }
 
 export interface Earnings {

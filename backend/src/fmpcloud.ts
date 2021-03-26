@@ -106,7 +106,7 @@ export default class FMPCloud {
     startDate = new Date(Date.now()),
     endDate = new Date(Date.now()),
     timePeriod = TimePeriod['1hour']
-  ) => {
+  ): Promise<Stock[]> => {
     try {
       if (timePeriod in TimePeriod === false) {
         throw new Error('Invalid time period');
@@ -118,14 +118,39 @@ export default class FMPCloud {
       const e = this._formatDateString(endDate);
       const url = `${b}/historical-chart/${t}/${symbol.toUpperCase()}?from=${s}&to=${e}&apikey=${a}`;
       const res = await got(url);
-      return JSON.parse(res.body) as Stock[];
+      return JSON.parse(res.body);
     } catch (err) {
       console.log(`Error : [HistoricalStock] : ${err}`);
       throw err;
     }
   };
 
-  VibeCheck = (symbol: string, count = 4): EarningsVibe[] => {
-    return [];
+  VibeCheck = async (symbol: string, count = 4): Promise<any> => {
+    try {
+      const earnings = await this.HistoricalEarnings(symbol, count);
+      const stockDataRequests = earnings.map((e) =>
+        this.HistoricalStock(
+          e.symbol,
+          e.daysBefore,
+          e.daysAfter,
+          TimePeriod['1min']
+        )
+      );
+      const stockData = await Promise.all(stockDataRequests);
+      const vibes = earnings.map((earning) => {
+        const vibe = { earning, stock: ([] as Stock[]) };
+        stockData.forEach((sd) => {
+          if (sd[0].earningsDate && sd[0].earningsDate === earning.date) {
+            vibe.stock = sd;
+          }
+        })
+        return vibe;
+      });
+      console.log({ finalEarnings: vibes });
+      return vibes;
+    } catch (e) {
+      console.error(`Error : [VibeCheck] : ${e}`);
+      throw e;
+    }
   };
 }
