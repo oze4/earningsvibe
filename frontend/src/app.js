@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { Fragment, useState } from 'react';
 import { Container, Col, Row } from 'react-bootstrap';
 
 import { Topbar, BodyContainer, Overlay, Input } from './components';
@@ -14,6 +14,7 @@ function App() {
       `/api/vibe_check?symbol=${event.target.value}&count=4`
     );
     const json = await resp.json();
+    console.log({ earningsVibe: json });
     setStock(json);
   };
 
@@ -21,9 +22,7 @@ function App() {
     if (event.key === 'Enter') {
       setIsLoading(true);
       event.preventDefault();
-      // await handleOnSubmit(event);
-      const sleep = (ms) => new Promise(r => setTimeout(r, ms));
-      await sleep(4000);
+      await handleOnSubmit(event);
       setIsLoading(false);
     }
   };
@@ -32,33 +31,33 @@ function App() {
     <Container fluid className="pl-0 pr-0 bg-gray">
       {/* If the overlay is open, don't show anything behind it */}
       {!overlayOpen && (
-        <Topbar
-          brand="earningsvibe.com"
-          expand="sm"
-          searchButtonText="Vibe Check"
-          searchPlaceholderText="Ticker"
-        />
+        <Fragment>
+          <Topbar
+            brand="earningsvibe.com"
+            expand="sm"
+            searchButtonText="Vibe Check"
+            searchPlaceholderText="Ticker"
+          />
+          <BodyContainer className="mt-2">
+            <div>
+              <h1>I am the body</h1>
+            </div>
+          </BodyContainer>
+        </Fragment>
       )}
-      <BodyContainer className="mt-2">
-        {!overlayOpen && (
-          <div>
-            <h1>I am the body</h1>
-          </div>
-        )}
-        <Overlay isOpen={overlayOpen} hasCloseButton={false}>
-          <Row className="justify-content-center center-me">
-            <Col xs className="ml-5 mr-5">
-              <Input
-                isLoading={isLoading}
-                placeholder="ticker"
-                type="text"
-                className="input--fullscreen"
-                onKeyPress={(e) => handleOnKeyPress(e)}
-              />
-            </Col>
-          </Row>
-        </Overlay>
-      </BodyContainer>
+      <Overlay isOpen={overlayOpen} hasCloseButton={false}>
+        <Row className="justify-content-center center-me">
+          <Col xs className="ml-5 mr-5">
+            <Input
+              isLoading={isLoading}
+              placeholder="ticker"
+              type="text"
+              className="input--fullscreen"
+              onKeyPress={(e) => handleOnKeyPress(e)}
+            />
+          </Col>
+        </Row>
+      </Overlay>
     </Container>
   );
 }

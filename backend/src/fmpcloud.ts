@@ -83,8 +83,8 @@ export default class FMPCloud {
       return earnings.map((e) => {
         const d = new Date(e.date);
         const y = d.getFullYear();
-        const b = getRelativeDate(BeforeOrAfter.before, 60, d);
-        const a = getRelativeDate(BeforeOrAfter.after, 60, d);
+        const b = getRelativeDate(BeforeOrAfter.before, 2, d);
+        const a = getRelativeDate(BeforeOrAfter.after, 2, d);
         const _meta = { year: y, daysBefore: b, daysAfter: a };
         return { ...e, _meta };
       });
