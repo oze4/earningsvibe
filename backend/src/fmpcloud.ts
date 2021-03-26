@@ -70,24 +70,28 @@ export default class FMPCloud {
     numberOfPriorEarnings: number
   ) => {
     try {
-      const l = numberOfPriorEarnings;
+      // NOTE : we have to double the earnings count because fmpcloud.io will return
+      // the "next" earnings date(s), even though there will be no data.... Sometimes they
+      // return one null date, sometimes two... We just double, then slice at the end.
+      const l = numberOfPriorEarnings * 2;
       const b = this.#baseURL;
       const a = this.#apiKey;
       const s = symbol.toUpperCase();
       const u = `${b}/historical/earning_calendar/${s}?limit=${l}&apikey=${a}`;
       const r = await got(u);
-      const earnings: Earnings[] = JSON.parse(r.body).filter(
-        // fmpcloud.io gives us the next upcoming earnings data, which is empty, because it hasn't come yet. So we don't care about it.
-        (e: Earnings) => new Date(e.date) < new Date(Date.now())
-      );
-      return earnings.map((e) => {
-        const d = new Date(e.date);
-        const y = d.getFullYear();
-        const b = getRelativeDate(BeforeOrAfter.before, 2, d);
-        const a = getRelativeDate(BeforeOrAfter.after, 2, d);
-        const _meta = { year: y, daysBefore: b, daysAfter: a };
-        return { ...e, _meta };
-      });
+      const earnings: Earnings[] = JSON.parse(r.body);
+      return earnings
+        .filter(
+          (e: Earnings) =>
+            e.eps !== null && new Date(e.date) < new Date(Date.now())
+        )
+        .map((e) => {
+          const d = new Date(e.date);
+          const daysBefore = getRelativeDate(BeforeOrAfter.before, 2, d);
+          const daysAfter = getRelativeDate(BeforeOrAfter.after, 2, d);
+          return { ...e, daysAfter, daysBefore };
+        })
+        .slice(0, numberOfPriorEarnings);
     } catch (e) {
       console.log('Error : HistoricalEarnings : ', e);
       throw e;
@@ -103,8 +107,8 @@ export default class FMPCloud {
    */
   HistoricalStock = async (
     symbol: string,
-    startDate = new Date(Date.now()),
-    endDate = new Date(Date.now()),
+    startDate: Date,
+    endDate: Date,
     timePeriod = TimePeriod['1hour']
   ): Promise<Stock[]> => {
     try {
@@ -128,25 +132,25 @@ export default class FMPCloud {
   VibeCheck = async (symbol: string, count = 4): Promise<any> => {
     try {
       const earnings = await this.HistoricalEarnings(symbol, count);
-      const stockDataRequests = earnings.map((e) =>
-        this.HistoricalStock(
+      const stockDataRequests = earnings.map((e) => {
+        return this.HistoricalStock(
           e.symbol,
           e.daysBefore,
           e.daysAfter,
           TimePeriod['1min']
-        )
-      );
-      const stockData = await Promise.all(stockDataRequests);
+        );
+      });
+      const stockDatas = await Promise.all(stockDataRequests);
       const vibes = earnings.map((earning) => {
-        const vibe = { earning, stock: ([] as Stock[]) };
-        stockData.forEach((sd) => {
-          if (sd[0].earningsDate && sd[0].earningsDate === earning.date) {
-            vibe.stock = sd;
+        let vibe = { earning, stock: [] as Stock[] };
+        stockDatas.forEach((stockData) => {
+          const sdDate = new Date(stockData[0].date);
+          if (sdDate >= earning.daysBefore && sdDate <= earning.daysAfter) {
+            vibe.stock = stockData;
           }
-        })
+        });
         return vibe;
       });
-      console.log({ finalEarnings: vibes });
       return vibes;
     } catch (e) {
       console.error(`Error : [VibeCheck] : ${e}`);

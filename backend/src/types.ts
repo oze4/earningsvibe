@@ -8,20 +8,18 @@ export interface Stock {
   unadjustedVolume?: number;
   vwap?: number;
   // "Main" props returned by fmpcloud.io for charting
-  close?: number; 
-  date?: Date;
-  low?: number; 
-  open?: number;
-  high?: number;
-  volume?: number;
+  close: number; 
+  date: Date;
+  low: number; 
+  open: number;
+  high: number;
+  volume: number;
 }
 
 export interface Earnings {
-  // Optional
-  daysBefore?: Date;
-  daysAfter?: Date;
-  eps?: number;
-  // Required
+  daysBefore: Date;
+  daysAfter: Date;
+  eps: number;
   date: Date;
   epsEstimated: number;
   revenue: number;

@@ -12,7 +12,7 @@ import { BeforeOrAfter, TimePeriod } from './types';
  * @param {String} beforeOrAfter ("after"|"before")
  * @param {Number} numberOfDays number of days before or after the 'date' param
  * @param {Date} date the 'RelativeToDate' in 'getDateRelativeToDate'
- * @returns {Date || null}
+ * @returns {Date}
  */
 export function getRelativeDate(
   beforeOrAfter: BeforeOrAfter,
@@ -35,5 +35,5 @@ export function getRelativeDate(
   if (beforeOrAfter === BeforeOrAfter.before) {
     return new Date(d.setDate(d.getDate() - numberOfDays));
   }
-  return null;
+  throw new Error('beforeOrAfter not equal to "before" or "after"');
 }

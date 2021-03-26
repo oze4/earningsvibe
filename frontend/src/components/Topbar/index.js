@@ -4,7 +4,7 @@ import { Navbar, Form, FormControl, Button } from 'react-bootstrap';
 const { Brand } = Navbar;
 
 export default function Topbar(props) {
-  const { onSearch, searchPlaceholderText, buttonText, brand, ...rest } = props;
+  const { onSearch, searchPlaceholderText, onSearchClick = (event) => {}, buttonText, brand, ...rest } = props;
 
   return (
     <Navbar {...rest}>
@@ -14,6 +14,7 @@ export default function Topbar(props) {
           type="text"
           placeholder={searchPlaceholderText || 'Search'}
           className="mr-sm-2"
+          onClick={e => onSearchClick(e)}
         />
         <Button variant="outline-light">{buttonText || 'Search'}</Button>
       </Form>

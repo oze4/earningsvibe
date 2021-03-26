@@ -4,18 +4,16 @@ import { Container, Col, Row } from 'react-bootstrap';
 import { Topbar, BodyContainer, Overlay, Input } from './components';
 
 function App() {
-  const [Stock, setStock] = useState(undefined);
+  const [data, setData] = useState(undefined);
   const [overlayOpen, setOverlayOpen] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
 
   const handleOnSubmit = async (event) => {
-    const resp = await fetch(
-      // Defaults to one years worth (typically) of earnings
-      `/api/vibe_check?symbol=${event.target.value}&count=4`
-    );
+    // Defaults to one years worth (typically) of earnings (referring to count=4)
+    const url = `/api/vibe_check?symbol=${event.target.value}&count=4`
+    const resp = await fetch(url);
     const json = await resp.json();
-    console.log({ earningsVibe: json });
-    setStock(json);
+    setData(json);
   };
 
   const handleOnKeyPress = async (event) => {
@@ -24,24 +22,24 @@ function App() {
       event.preventDefault();
       await handleOnSubmit(event);
       setIsLoading(false);
+      setOverlayOpen(false);
     }
   };
 
   return (
     <Container fluid className="pl-0 pr-0 bg-gray">
       {/* If the overlay is open, don't show anything behind it */}
-      {!overlayOpen && (
+      {!overlayOpen && data.length && (
         <Fragment>
           <Topbar
             brand="earningsvibe.com"
             expand="sm"
             searchButtonText="Vibe Check"
             searchPlaceholderText="Ticker"
+            onSearchClick={e => alert('you clicked the top bar')}
           />
           <BodyContainer className="mt-2">
-            <div>
-              <h1>I am the body</h1>
-            </div>
+            <pre>{JSON.stringify(data, null, 2)}</pre>
           </BodyContainer>
         </Fragment>
       )}
