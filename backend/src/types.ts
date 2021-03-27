@@ -5,6 +5,9 @@ export interface Stock {
   changePercent?: number;
   earningsDate?: Date;
   label?: string; 
+  // Have to rename `changePercent` to `percentChange`,
+  // so it plays nice with react-stockcharts
+  percentChange?: number,
   unadjustedVolume?: number;
   vwap?: number;
   // "Main" props returned by fmpcloud.io for charting

@@ -1,11 +1,5 @@
 import got from 'got';
-import {
-  Earnings,
-  BeforeOrAfter,
-  Stock,
-  TimePeriod,
-  EarningsVibe
-} from './types';
+import { Earnings, BeforeOrAfter, Stock, TimePeriod } from './types';
 import { getRelativeDate } from './utils';
 
 /**
@@ -26,7 +20,7 @@ export default class FMPCloud {
    * Formats a date to YYYY-MM-DD
    * @param {Date} date date to format
    */
-  _formatDateString = (date = new Date(Date.now())) => {
+  #formatDateString = (date = new Date(Date.now())) => {
     const x = new Date(date);
     const year = x.getFullYear();
     // need a 2 digit month
@@ -43,16 +37,19 @@ export default class FMPCloud {
   };
 
   /**
-   * Returns info about a symbol
+   * Returns "company profile" (misc data) for a symbol
    * @param {string} symbol ticker symbol
    */
   CompanyProfile = async (symbol = '') => {
     try {
-      const a = this.#apiKey;
-      const b = this.#baseURL;
-      const s = symbol.toUpperCase();
-      const u = `${b}/profile/${s}?apikey=${a}`;
-      const r = await got(u);
+      const url =
+        this.#baseURL +
+        '/profile/' +
+        symbol.toUpperCase() +
+        '?apikey=' +
+        this.#apiKey;
+
+      const r = await got(url);
       return JSON.parse(r.body);
     } catch (e) {
       console.log('Error : CompanyProfile : ', e);
@@ -70,28 +67,39 @@ export default class FMPCloud {
     numberOfPriorEarnings: number
   ) => {
     try {
-      // NOTE : we have to double the earnings count because fmpcloud.io will return
-      // the "next" earnings date(s), even though there will be no data.... Sometimes they
-      // return one null date, sometimes two... We just double, then slice at the end.
-      const l = numberOfPriorEarnings * 2;
-      const b = this.#baseURL;
-      const a = this.#apiKey;
-      const s = symbol.toUpperCase();
-      const u = `${b}/historical/earning_calendar/${s}?limit=${l}&apikey=${a}`;
-      const r = await got(u);
+      const url =
+        this.#baseURL +
+        '/historical/earning_calendar/' +
+        symbol.toUpperCase() +
+        '?limit=' +
+        // NOTE : we have to add a buffer the earnings count because fmpcloud.io will return
+        // the "next" earnings date(s), even though there will be no data.... Sometimes they
+        // return one null date, sometimes two, etc... We add a buffer, then slice at the end
+        // as to return the requested amount of earnings.
+        String(numberOfPriorEarnings + 5) +
+        '&apikey=' +
+        this.#apiKey;
+
+      const r = await got(url);
       const earnings: Earnings[] = JSON.parse(r.body);
-      return earnings
-        .filter(
-          (e: Earnings) =>
-            e.eps !== null && new Date(e.date) < new Date(Date.now())
-        )
-        .map((e) => {
-          const d = new Date(e.date);
-          const daysBefore = getRelativeDate(BeforeOrAfter.before, 2, d);
-          const daysAfter = getRelativeDate(BeforeOrAfter.after, 2, d);
-          return { ...e, daysAfter, daysBefore };
-        })
-        .slice(0, numberOfPriorEarnings);
+
+      return (
+        earnings
+          // fmpcloud will give us future earnings, even though the objects will not contain data.
+          // We only care about earnings that have already been reported.
+          .filter((e: Earnings) => e.eps !== null)
+          // Add start and end dates to each Earning object
+          .map((e) => {
+            const d = new Date(e.date);
+            return {
+              ...e,
+              daysAfter: getRelativeDate(BeforeOrAfter.before, 2, d),
+              daysBefore: getRelativeDate(BeforeOrAfter.after, 2, d)
+            };
+          })
+          // Only return requested amount of earnings
+          .slice(0, numberOfPriorEarnings)
+      );
     } catch (e) {
       console.log('Error : HistoricalEarnings : ', e);
       throw e;
@@ -115,12 +123,20 @@ export default class FMPCloud {
       if (timePeriod in TimePeriod === false) {
         throw new Error('Invalid time period');
       }
-      const b = this.#baseURL;
-      const a = this.#apiKey;
-      const t = timePeriod.toString();
-      const s = this._formatDateString(startDate);
-      const e = this._formatDateString(endDate);
-      const url = `${b}/historical-chart/${t}/${symbol.toUpperCase()}?from=${s}&to=${e}&apikey=${a}`;
+
+      const url =
+        this.#baseURL +
+        '/historical-chart/' +
+        timePeriod.toString() +
+        '/' +
+        symbol.toUpperCase() +
+        '?from=' +
+        this.#formatDateString(startDate) +
+        '&to=' +
+        this.#formatDateString(endDate) +
+        '&apikey=' +
+        this.#apiKey;
+
       const res = await got(url);
       return JSON.parse(res.body);
     } catch (err) {
@@ -129,6 +145,12 @@ export default class FMPCloud {
     }
   };
 
+  /**
+   * Gets N earnings for X symbol. Gathers intraday data for the dates "surrounding" each
+   * earnings report (so you can get a feel for historical bias).
+   * @param {string} symbol ticker symbol
+   * @param {number} count number of historical earnings to vibe check
+   */
   VibeCheck = async (symbol: string, count = 4): Promise<any> => {
     try {
       const earnings = await this.HistoricalEarnings(symbol, count);
@@ -140,8 +162,9 @@ export default class FMPCloud {
           TimePeriod['1min']
         );
       });
+
       const stockDatas = await Promise.all(stockDataRequests);
-      const vibes = earnings.map((earning) => {
+      return earnings.map((earning) => {
         let vibe = { earning, stock: [] as Stock[] };
         stockDatas.forEach((stockData) => {
           const sdDate = new Date(stockData[0].date);
@@ -151,7 +174,6 @@ export default class FMPCloud {
         });
         return vibe;
       });
-      return vibes;
     } catch (e) {
       console.error(`Error : [VibeCheck] : ${e}`);
       throw e;

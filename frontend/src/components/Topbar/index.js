@@ -4,7 +4,7 @@ import { Navbar, Form, FormControl, Button } from 'react-bootstrap';
 const { Brand } = Navbar;
 
 export default function Topbar(props) {
-  const { onSearch, searchPlaceholderText, onSearchClick = (event) => {}, buttonText, brand, ...rest } = props;
+  const { onSearch, searchPlaceholderText, isSearchButton, onSearchClick = (event) => {}, buttonText, brand, ...rest } = props;
 
   return (
     <Navbar {...rest}>
@@ -16,7 +16,7 @@ export default function Topbar(props) {
           className="mr-sm-2"
           onClick={e => onSearchClick(e)}
         />
-        <Button variant="outline-light">{buttonText || 'Search'}</Button>
+        {isSearchButton && <Button variant="outline-light">{buttonText || 'Search'}</Button>}
       </Form>
     </Navbar>
   );

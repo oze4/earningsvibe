@@ -1,5 +1,5 @@
-import React, { Fragment, useState } from 'react';
-import { Container, Col, Row } from 'react-bootstrap';
+import React, { Fragment, useState, useEffect } from 'react';
+import { Container, Col, Row, Spinner } from 'react-bootstrap';
 
 import { Topbar, BodyContainer, Overlay, Input } from './components';
 
@@ -8,9 +8,11 @@ function App() {
   const [overlayOpen, setOverlayOpen] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
 
+  useEffect(() => {}, []);
+
   const handleOnSubmit = async (event) => {
     // Defaults to one years worth (typically) of earnings (referring to count=4)
-    const url = `/api/vibe_check?symbol=${event.target.value}&count=4`
+    const url = `/api/vibe_check?symbol=${event.target.value}&count=4`;
     const resp = await fetch(url);
     const json = await resp.json();
     setData(json);
@@ -34,9 +36,8 @@ function App() {
           <Topbar
             brand="earningsvibe.com"
             expand="sm"
-            searchButtonText="Vibe Check"
             searchPlaceholderText="Ticker"
-            onSearchClick={e => alert('you clicked the top bar')}
+            onSearchClick={(e) => setOverlayOpen(true)}
           />
           <BodyContainer className="mt-2">
             <pre>{JSON.stringify(data, null, 2)}</pre>
@@ -53,6 +54,11 @@ function App() {
               className="input--fullscreen"
               onKeyPress={(e) => handleOnKeyPress(e)}
             />
+            {isLoading && (
+              <Spinner style={{ color: 'white' }} className="justify-content-end" animation="border" role="status">
+                <span className="sr-only">Loading...</span>
+              </Spinner>
+            )}
           </Col>
         </Row>
       </Overlay>
