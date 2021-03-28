@@ -93,8 +93,8 @@ export default class FMPCloud {
             const d = new Date(e.date);
             return {
               ...e,
-              daysAfter: getRelativeDate(BeforeOrAfter.before, 2, d),
-              daysBefore: getRelativeDate(BeforeOrAfter.after, 2, d)
+              daysAfter: getRelativeDate(BeforeOrAfter.after, 2, d),
+              daysBefore: getRelativeDate(BeforeOrAfter.before, 2, d)
             };
           })
           // Only return requested amount of earnings

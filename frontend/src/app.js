@@ -8,7 +8,7 @@ function App() {
   const [overlayOpen, setOverlayOpen] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
 
-  useEffect(() => {}, []);
+  // useEffect(() => {}, []);
 
   const handleOnSubmit = async (event) => {
     // Defaults to one years worth (typically) of earnings (referring to count=4)
@@ -23,8 +23,8 @@ function App() {
       setIsLoading(true);
       event.preventDefault();
       await handleOnSubmit(event);
-      setIsLoading(false);
       setOverlayOpen(false);
+      setIsLoading(false);
     }
   };
 
@@ -47,15 +47,21 @@ function App() {
       <Overlay isOpen={overlayOpen} hasCloseButton={false}>
         <Row className="justify-content-center center-me">
           <Col xs className="ml-5 mr-5">
-            <Input
-              isLoading={isLoading}
-              placeholder="ticker"
-              type="text"
-              className="input--fullscreen"
-              onKeyPress={(e) => handleOnKeyPress(e)}
-            />
-            {isLoading && (
-              <Spinner style={{ color: 'white' }} className="justify-content-end" animation="border" role="status">
+            {!isLoading && overlayOpen ? (
+              <input
+                spellCheck={false}
+                placeholder="ticker"
+                type="text"
+                className="input--fullscreen"
+                onKeyPress={(e) => handleOnKeyPress(e)}
+              />
+            ) : (
+              <Spinner
+                variant="light"
+                className="justify-content-end"
+                animation="border"
+                role="status"
+              >
                 <span className="sr-only">Loading...</span>
               </Spinner>
             )}
