@@ -13,7 +13,8 @@ if (!process.env.FMPCLOUD_API_KEY) {
 
 const fmpcloud = new FMPCloud(process.env.FMPCLOUD_API_KEY);
 const app = express();
-const appPort = process.env.PORT || 8081;
+const appPort = Number(process.env.PORT || 8081);
+const appIp = '0.0.0.0';
 const feBuildPath = path.resolve(__dirname, '../../build/frontend');
 const feStaticAssets = path.join(feBuildPath, '/static');
 
@@ -97,6 +98,6 @@ app.get('*', (_req: Request, res: Response) => {
   res.status(404).send({ response: null, status: 404 });
 });
 
-app.listen(appPort, () => {
+app.listen(appPort, appIp, () => {
   console.log(`App listening at : http://localhost:${appPort}`);
 });
