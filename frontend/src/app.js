@@ -1,4 +1,4 @@
-import React, { Fragment, useState, useRef, useEffect } from 'react';
+import React, { Fragment, useState, useCallback, useEffect } from 'react';
 import { Container, Col, Row, Spinner, Table, Card } from 'react-bootstrap';
 
 import {
@@ -13,14 +13,19 @@ function App() {
   const [overlayOpen, setOverlayOpen] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [chartWidth, setChartWidth] = useState();
-  const ref = useRef(null);
+
+  const ref = useCallback((node) => {
+    console.log('useCallback setting client width to', node.clientWidth);
+    setChartWidth(node.clientWidth);
+  }, []);
 
   const handleResize = () => {
-    console.log('resized to: ', window.innerWidth, 'x', window.innerHeight);
-    let w = document.body.getBoundingClientRect().width / 2;
+    let w = document.body.getBoundingClientRect();
+    console.log('default width :', w.width, 'x', w.height);
+    w = w.width;
     if (ref && ref.current) {
-      console.log('ref found')
-      w = ref.current.getBoundingClientRect().width;
+      w = ref.current.clientWidth;
+      console.log('ref found, changing default width to :', w);
     }
     setChartWidth(w);
   }
@@ -32,6 +37,7 @@ function App() {
   useEffect(() => {
     console.log('data changed');
     if (data && data.length) {
+      console.log('data changed and about to handle resize');
       handleResize();
     }
   }, [data]);
