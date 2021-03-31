@@ -15,8 +15,12 @@ function App() {
   const [chartWidth, setChartWidth] = useState();
 
   const ref = useCallback((node) => {
-    console.log('useCallback setting client width to', node.clientWidth);
-    setChartWidth(node.clientWidth);
+    if (node) {
+      console.log('useCallback setting client width to', node.clientWidth);
+      setChartWidth(node.clientWidth);
+    } else {
+      console.log('no node found in useCallback')
+    }
   }, []);
 
   const handleResize = () => {
@@ -55,7 +59,9 @@ function App() {
       setIsLoading(true);
       event.preventDefault();
       await handleOnSubmit(event);
+      console.log('setting overlayopen to false')
       setOverlayOpen(false);
+      console.log('setting isLoading to false')
       setIsLoading(false);
     }
   };
