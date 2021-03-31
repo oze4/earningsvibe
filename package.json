@@ -15,7 +15,7 @@
     "start:dev": "yarn build && node build/backend/index.js",
     "start": "node build/backend/index.js",
     "format": "prettier --write \"**/*.+(js|jsx|json|css|md)\"",
-    "heroku-postbuild": "yarn install:front && yarn build:front"
+    "heroku-postbuild": "yarn install:front && yarn build"
   },
   "dependencies": {
     "@types/dotenv": "^8.2.0",
