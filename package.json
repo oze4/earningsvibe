@@ -8,12 +8,13 @@
   "scripts": {
     "start:front": "yarn --cwd frontend start",
     "build:front": "yarn --cwd frontend build",
+    "install:front": "yarn --cwd frontend install",
     "start:back": "nodemon --watch 'backend' --exec 'ts-node' --project backend/tsconfig.json --log-error backend/index.ts",
     "build:back": "tsc --project backend/tsconfig.json",
     "build": "yarn build:front && yarn build:back",
     "start": "yarn build && node build/backend/index.js",
     "format": "prettier --write \"**/*.+(js|jsx|json|css|md)\"",
-    "heroku-postbuild": "cd frontend && yarn install && cd .. && yarn build:front"
+    "heroku-postbuild": "yarn install:front && yarn build:front"
   },
   "dependencies": {
     "@types/dotenv": "^8.2.0",
