@@ -19,22 +19,32 @@ function App() {
   const [overlayOpen, setOverlayOpen] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [chartWidth, setChartWidth] = useState();
+  const [stateRef, setStateRef] = useState(null);
   // const ref = useRef(null);
 
-  function handleResize(n) {
+  function handleResize(node) {
     let w = 900;
-    if (n) {
-      w = n.clientWidth;
+    if (node) {
+      w = node.clientWidth;
     }
     setChartWidth(w);
   }
 
   const ref = useCallback((node) => {
     if (node) {
+      setStateRef(node);
       setChartWidth(node.clientWidth);
       window.addEventListener('resize', () => handleResize(node));
     }
   }, []);
+
+  useEffect(() => {
+    console.log({ data });
+    if (data && stateRef) {
+      console.log('data && stateRef', {data,stateRef}); 
+      setChartWidth(stateRef.clientWidth);
+    }
+  }, [data]);
 
   const handleOnSubmit = async (event) => {
     try {
