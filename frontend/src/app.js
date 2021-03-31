@@ -65,7 +65,7 @@ function App() {
                 {data.map((vibe) => {
                   return (
                     <Row className="justify-content-center center-me">
-                      <Col xs={8}>
+                      <Col xs={12} md={8}>
                         <Card className="mt-5 mb-5">
                           <Card.Header>
                             <Table striped bordered hover responsive>

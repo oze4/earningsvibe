@@ -6,6 +6,7 @@
   "author": "Matt Oestreich <matthewpoestreich@gmail.com>",
   "license": "MIT",
   "scripts": {
+    "install": "yarn install && cd frontend && yarn install",
     "start:front": "yarn --cwd frontend start",
     "build:front": "yarn --cwd frontend build",
     "start:back": "nodemon --watch 'backend' --exec 'ts-node' --project backend/tsconfig.json --log-error backend/index.ts",
