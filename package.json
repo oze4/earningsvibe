@@ -7,7 +7,7 @@
   "license": "MIT",
   "scripts": {
     "start:front": "yarn --cwd frontend start",
-    "build:front": "NODE_ENV=development yarn --cwd frontend build",
+    "build:front": "yarn --cwd frontend build",
     "install:front": "yarn --cwd frontend install",
     "start:back": "nodemon --watch 'backend' --exec 'ts-node' --project backend/tsconfig.json --log-error backend/index.ts",
     "build:back": "tsc --project backend/tsconfig.json",
