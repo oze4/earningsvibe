@@ -12,6 +12,29 @@ function App() {
   const [data, setData] = useState(undefined);
   const [overlayOpen, setOverlayOpen] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
+  const [chartWidth, setChartWidth] = useState();
+  const ref = useRef(null);
+
+  const handleResize = () => {
+    console.log('resized to: ', window.innerWidth, 'x', window.innerHeight);
+    let w = document.body.getBoundingClientRect().width / 2;
+    if (ref.current) {
+      console.log('ref found')
+      w = ref.current.getBoundingClientRect().width;
+    }
+    setChartWidth(w);
+  }
+
+  useEffect(() => {
+    window.addEventListener('resize', handleResize);
+  }, []);
+
+  useEffect(() => {
+    console.log('data changed');
+    if (data && data.length) {
+      handleResize();
+    }
+  }, [data]);
 
   const handleOnSubmit = async (event) => {
     // Defaults to one years worth (typically) of earnings (referring to count=4)
@@ -48,10 +71,10 @@ function App() {
                 {data.map((vibe) => {
                   return (
                     <Row className="justify-content-center center-me">
-                      <Col xs={8}>
-                        <Card className="mt-5">
+                      <Col xs={8} ref={ref}>
+                        <Card className="mt-5 mb-5">
                           <Card.Header>
-                            <Table striped bordered hover>
+                            <Table striped bordered hover responsive>
                               <thead>
                                 <tr>
                                   <th>Symbol</th>
@@ -78,7 +101,7 @@ function App() {
                             <CandleStickChartWithMA
                               type="svg"
                               height={600}
-                              width={1088}
+                              width={chartWidth}
                               data={vibe.stock.sort(
                                 (a, b) =>
                                   new Date(a.date).getTime() -

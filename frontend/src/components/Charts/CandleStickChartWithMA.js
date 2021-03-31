@@ -106,20 +106,22 @@ class CandleStickChartWithMA extends React.Component {
         xAccessor={xAccessor}
         displayXAccessor={displayXAccessor}
         xExtents={xExtents}
+        clamp
+        zoomEvent={false}
       >
         <Chart
           id={1}
           yExtents={[
-            (d) => [d.high, d.low],
+            (d) => [d.high + 10, d.low],
             sma20.accessor(),
             wma20.accessor(),
             tma20.accessor(),
             ema20.accessor(),
             ema50.accessor()
           ]}
-          padding={{ top: 10, bottom: 20 }}
+          // padding={{ top: 10, bottom: 20 }}
         >
-          <XAxis axisAt="bottom" orient="bottom" />
+          <XAxis axisAt="bottom" orient="bottom" ticks={5} />
           <YAxis axisAt="right" orient="right" ticks={5} />
 
           <MouseCoordinateY
@@ -129,11 +131,13 @@ class CandleStickChartWithMA extends React.Component {
           />
 
           <CandlestickSeries />
+
           <LineSeries yAccessor={sma20.accessor()} stroke={sma20.stroke()} />
           <LineSeries yAccessor={wma20.accessor()} stroke={wma20.stroke()} />
           <LineSeries yAccessor={tma20.accessor()} stroke={tma20.stroke()} />
           <LineSeries yAccessor={ema20.accessor()} stroke={ema20.stroke()} />
           <LineSeries yAccessor={ema50.accessor()} stroke={ema50.stroke()} />
+
           <CurrentCoordinate
             yAccessor={sma20.accessor()}
             fill={sma20.stroke()}
@@ -156,6 +160,7 @@ class CandleStickChartWithMA extends React.Component {
           />
 
           <OHLCTooltip origin={[-40, 0]} />
+
           <MovingAverageTooltip
             onClick={(e) => console.log(e)}
             origin={[-38, 15]}
@@ -209,7 +214,7 @@ class CandleStickChartWithMA extends React.Component {
           <YAxis
             axisAt="left"
             orient="left"
-            ticks={5}
+            ticks={1} /* CHANGED THIS */
             tickFormat={format('.2s')}
           />
 
