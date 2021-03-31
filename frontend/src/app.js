@@ -1,4 +1,4 @@
-import React, { Fragment, useState, useRef, useEffect } from 'react';
+import React, { Fragment, useState, useRef, useEffect, useCallback } from 'react';
 import { Container, Col, Row, Spinner, Table, Card } from 'react-bootstrap';
 
 import {
@@ -13,28 +13,22 @@ function App() {
   const [overlayOpen, setOverlayOpen] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [chartWidth, setChartWidth] = useState();
-  const ref = useRef(null);
+  // const ref = useRef(null);
 
-  const handleResize = () => {
-    console.log('resized to: ', window.innerWidth, 'x', window.innerHeight);
-    let w = document.body.getBoundingClientRect().width / 2;
-    if (ref.current) {
-      console.log('ref found')
-      w = ref.current.getBoundingClientRect().width;
+  function handleResize(n) {
+    let w = 900;
+    if (n) {
+      w = n.clientWidth;
     }
     setChartWidth(w);
   }
 
-  useEffect(() => {
-    window.addEventListener('resize', handleResize);
-  }, []);
-
-  useEffect(() => {
-    console.log('data changed');
-    if (data && data.length) {
-      handleResize();
+  const ref = useCallback((node) => {
+    if (node) {
+      setChartWidth(node.clientWidth);
+      window.addEventListener('resize', () => handleResize(node));
     }
-  }, [data]);
+  }, []);
 
   const handleOnSubmit = async (event) => {
     // Defaults to one years worth (typically) of earnings (referring to count=4)
@@ -71,7 +65,7 @@ function App() {
                 {data.map((vibe) => {
                   return (
                     <Row className="justify-content-center center-me">
-                      <Col xs={8} ref={ref}>
+                      <Col xs={8}>
                         <Card className="mt-5 mb-5">
                           <Card.Header>
                             <Table striped bordered hover responsive>
@@ -97,7 +91,7 @@ function App() {
                               </tbody>
                             </Table>
                           </Card.Header>
-                          <Card.Body className="p-0">
+                          <Card.Body className="p-0" ref={ref}>
                             <CandleStickChartWithMA
                               type="svg"
                               height={600}
