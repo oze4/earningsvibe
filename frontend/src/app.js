@@ -1,7 +1,14 @@
 import React, { Fragment, useState, useEffect } from 'react';
 import { Container, Col, Row, Spinner } from 'react-bootstrap';
 
-import { Topbar, BodyContainer, Overlay, Input } from './components';
+import {
+  Topbar,
+  BodyContainer,
+  Overlay,
+  Input,
+  CandleStickChartWithMA,
+  CandleStickChartWithBrush
+} from './components';
 
 function App() {
   const [data, setData] = useState(undefined);
@@ -40,7 +47,29 @@ function App() {
             onSearchClick={(e) => setOverlayOpen(true)}
           />
           <BodyContainer className="mt-2">
-            <pre>{JSON.stringify(data, null, 2)}</pre>
+            <Row>
+              <Col>
+                {data.map((vibe) => {
+                  return (
+                    <Row className="justify-content-center">
+                      <Col xs className="ml-5 mr-5">
+                        <h1>{JSON.stringify(vibe.earning, null, 2)}</h1>
+                        <CandleStickChartWithMA
+                          type="svg"
+                          height={500}
+                          width={800}
+                          data={vibe.stock.sort(
+                            (a, b) =>
+                              new Date(a.date).getTime() -
+                              new Date(b.date).getTime()
+                          )}
+                        />
+                      </Col>
+                    </Row>
+                  );
+                })}
+              </Col>
+            </Row>
           </BodyContainer>
         </Fragment>
       )}

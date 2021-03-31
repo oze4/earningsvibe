@@ -79,7 +79,7 @@ class CandleStickChartWithMA extends React.Component {
       .stroke('#4682B4')
       .fill('#4682B4');
 
-    const { type, data: initialData, width, ratio } = this.props;
+    const { type, data: initialData, width, height, ratio } = this.props;
 
     const calculatedData = ema20(
       sma20(wma20(tma20(ema50(smaVolume50(initialData)))))
@@ -91,18 +91,17 @@ class CandleStickChartWithMA extends React.Component {
       calculatedData
     );
 
-    const start = xAccessor(last(data));
-    const end = xAccessor(data[Math.max(0, data.length - 150)]);
-    const xExtents = [start, end];
+    // const start = xAccessor(last(data));
+    const end = xAccessor(data[Math.max(0, data.length - 1)]);
+    const xExtents = [0, end];
 
     return (
       <ChartCanvas
-        height={400}
+        height={height}
         width={width}
         ratio={ratio}
         margin={{ left: 70, right: 70, top: 10, bottom: 30 }}
         type={type}
-        seriesName="MSFT"
         data={data}
         xScale={xScale}
         xAccessor={xAccessor}
@@ -112,7 +111,7 @@ class CandleStickChartWithMA extends React.Component {
         <Chart
           id={1}
           yExtents={[
-            (d) => [d.high, d.low],
+            (d) => [d.high + 10, d.low],
             sma20.accessor(),
             wma20.accessor(),
             tma20.accessor(),
@@ -206,6 +205,8 @@ class CandleStickChartWithMA extends React.Component {
           height={150}
           origin={(w, h) => [0, h - 150]}
         >
+
+          {/* This is  */}
           <YAxis
             axisAt="left"
             orient="left"
@@ -213,11 +214,14 @@ class CandleStickChartWithMA extends React.Component {
             tickFormat={format('.2s')}
           />
 
+          {/* This is for the date/time when hovering */}
           <MouseCoordinateX
             at="bottom"
             orient="bottom"
-            displayFormat={timeFormat('%Y-%m-%d')}
+            displayFormat={timeFormat('%X')}
           />
+
+          {/* This is for volume display on left side */}
           <MouseCoordinateY
             at="left"
             orient="left"
@@ -248,13 +252,15 @@ class CandleStickChartWithMA extends React.Component {
 CandleStickChartWithMA.propTypes = {
   data: PropTypes.array.isRequired,
   width: PropTypes.number.isRequired,
+  height: PropTypes.number.isRequired,
   ratio: PropTypes.number.isRequired,
   type: PropTypes.oneOf(['svg', 'hybrid']).isRequired
 };
 
 CandleStickChartWithMA.defaultProps = {
   type: 'svg',
-  width: 400
+  width: 400,
+  height: 150
 };
 
 CandleStickChartWithMA = fitWidth(CandleStickChartWithMA);
