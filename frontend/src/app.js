@@ -1,21 +1,17 @@
-import React, { Fragment, useState, useEffect } from 'react';
-import { Container, Col, Row, Spinner } from 'react-bootstrap';
+import React, { Fragment, useState } from 'react';
+import { Container, Col, Row, Spinner, Table, Card } from 'react-bootstrap';
 
 import {
   Topbar,
   BodyContainer,
   Overlay,
-  Input,
-  CandleStickChartWithMA,
-  CandleStickChartWithBrush
+  CandleStickChartWithMA
 } from './components';
 
 function App() {
   const [data, setData] = useState(undefined);
   const [overlayOpen, setOverlayOpen] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
-
-  // useEffect(() => {}, []);
 
   const handleOnSubmit = async (event) => {
     // Defaults to one years worth (typically) of earnings (referring to count=4)
@@ -52,18 +48,45 @@ function App() {
                 {data.map((vibe) => {
                   return (
                     <Row className="justify-content-center">
-                      <Col xs className="ml-5 mr-5">
-                        <h1>{JSON.stringify(vibe.earning, null, 2)}</h1>
-                        <CandleStickChartWithMA
-                          type="svg"
-                          height={500}
-                          width={800}
-                          data={vibe.stock.sort(
-                            (a, b) =>
-                              new Date(a.date).getTime() -
-                              new Date(b.date).getTime()
-                          )}
-                        />
+                      <Col xs={1} className="ma-5">
+                        <Card>
+                          <Card.Header>
+                            <Table striped bordered hover>
+                              <thead>
+                                <tr>
+                                  <th>Symbol</th>
+                                  <th>Date</th>
+                                  <th>EPS Estimate</th>
+                                  <th>EPS Actual</th>
+                                  <th>Revenue Estimate</th>
+                                  <th>Revenue Actual</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                <tr>
+                                  <td>{vibe.earning.symbol}</td>
+                                  <td>{vibe.earning.date}</td>
+                                  <td>{vibe.earning.epsEstimated}</td>
+                                  <td>{vibe.earning.eps}</td>
+                                  <td>{vibe.earning.revenueEstimated}</td>
+                                  <td>{vibe.earning.revenue}</td>
+                                </tr>
+                              </tbody>
+                            </Table>
+                          </Card.Header>
+                          <Card.Body>
+                            <CandleStickChartWithMA
+                              type="svg"
+                              height={500}
+                              width={800}
+                              data={vibe.stock.sort(
+                                (a, b) =>
+                                  new Date(a.date).getTime() -
+                                  new Date(b.date).getTime()
+                              )}
+                            />
+                          </Card.Body>
+                        </Card>
                       </Col>
                     </Row>
                   );

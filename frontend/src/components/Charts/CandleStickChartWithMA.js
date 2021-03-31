@@ -26,7 +26,6 @@ import {
 } from 'react-stockcharts/lib/tooltip';
 import { ema, wma, sma, tma } from 'react-stockcharts/lib/indicator';
 import { fitWidth } from 'react-stockcharts/lib/helper';
-import { last } from 'react-stockcharts/lib/utils';
 
 class CandleStickChartWithMA extends React.Component {
   render() {
@@ -111,7 +110,7 @@ class CandleStickChartWithMA extends React.Component {
         <Chart
           id={1}
           yExtents={[
-            (d) => [d.high + 10, d.low],
+            (d) => [d.high, d.low],
             sma20.accessor(),
             wma20.accessor(),
             tma20.accessor(),
