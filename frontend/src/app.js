@@ -1,4 +1,10 @@
-import React, { Fragment, useState, useRef, useEffect, useCallback } from 'react';
+import React, {
+  Fragment,
+  useState,
+  useRef,
+  useEffect,
+  useCallback
+} from 'react';
 import { Container, Col, Row, Spinner, Table, Card } from 'react-bootstrap';
 
 import {
@@ -31,11 +37,17 @@ function App() {
   }, []);
 
   const handleOnSubmit = async (event) => {
-    // Defaults to one years worth (typically) of earnings (referring to count=4)
-    const url = `/api/vibe_check?symbol=${event.target.value}&count=4`;
-    const resp = await fetch(url);
-    const json = await resp.json();
-    setData(json);
+    try {
+      // Defaults to one years worth (typically) of earnings (referring to count=4)
+      const url = `/api/vibe_check?symbol=${event.target.value}&count=4`;
+      const resp = await fetch(url);
+      const json = await resp.json();
+      console.log('[handleOnSubmit] about to set data from api');
+      setData(json);
+    } catch (e) {
+      console.error(e);
+      setData([]);
+    }
   };
 
   const handleOnKeyPress = async (event) => {
