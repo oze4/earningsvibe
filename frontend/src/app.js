@@ -1,4 +1,4 @@
-import React, { Fragment, useState } from 'react';
+import React, { Fragment, useState, useRef } from 'react';
 import { Container, Col, Row, Spinner, Table, Card } from 'react-bootstrap';
 
 import {
@@ -12,6 +12,7 @@ function App() {
   const [data, setData] = useState(undefined);
   const [overlayOpen, setOverlayOpen] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
+  const ref = useRef();
 
   const handleOnSubmit = async (event) => {
     // Defaults to one years worth (typically) of earnings (referring to count=4)
@@ -31,6 +32,11 @@ function App() {
     }
   };
 
+  const calcWidth = (el) => {
+    console.log({el});
+    return el.parentElement.clientWidth;
+  }
+
   return (
     <Container fluid className="pl-0 pr-0 bg-gray">
       {/* If the overlay is open, don't show anything behind it */}
@@ -48,8 +54,8 @@ function App() {
                 {data.map((vibe) => {
                   return (
                     <Row className="justify-content-center">
-                      <Col xs={1} className="ma-5">
-                        <Card>
+                      <Col xs={12} className="ml-5 mr-5" ref={ref}>
+                        <Card className="mt-5">
                           <Card.Header>
                             <Table striped bordered hover>
                               <thead>
@@ -76,9 +82,10 @@ function App() {
                           </Card.Header>
                           <Card.Body>
                             <CandleStickChartWithMA
+                              className="center-me"
                               type="svg"
-                              height={500}
-                              width={800}
+                              height={600}
+                              width={calcWidth(ref.current)}
                               data={vibe.stock.sort(
                                 (a, b) =>
                                   new Date(a.date).getTime() -
