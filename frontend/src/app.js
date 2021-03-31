@@ -18,7 +18,7 @@ function App() {
   const handleResize = () => {
     console.log('resized to: ', window.innerWidth, 'x', window.innerHeight);
     let w = document.body.getBoundingClientRect().width / 2;
-    if (ref.current) {
+    if (ref && ref.current) {
       console.log('ref found')
       w = ref.current.getBoundingClientRect().width;
     }
