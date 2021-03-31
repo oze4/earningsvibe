@@ -107,6 +107,7 @@ class CandleStickChartWithMA extends Component {
         displayXAccessor={displayXAccessor}
         xExtents={xExtents}
         clamp
+        panEvent={true}
         zoomEvent={false}
       >
         <Chart
@@ -119,7 +120,7 @@ class CandleStickChartWithMA extends Component {
             ema20.accessor(),
             ema50.accessor()
           ]}
-          // padding={{ top: 10, bottom: 20 }}
+          padding={{ top: 10, bottom: 20 }}
         >
           <XAxis axisAt="bottom" orient="bottom" ticks={5} />
           <YAxis axisAt="right" orient="right" ticks={5} />

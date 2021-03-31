@@ -13,38 +13,48 @@ function App() {
   const [overlayOpen, setOverlayOpen] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [chartWidth, setChartWidth] = useState();
+  const [stateRef, setStateRef] = useState();
 
-  const ref = useCallback((node) => {
-    if (node) {
-      console.log('useCallback setting client width to', node.clientWidth);
-      setChartWidth(node.clientWidth);
-    } else {
-      console.log('no node found in useCallback')
-    }
-  }, []);
+  const ref = useCallback(
+    (node) => {
+      if (!isLoading && !overlayOpen && data) {
+        if (node) {
+          console.log('useCallback setting client width to', node.clientWidth, 'from :', );
+          setStateRef(node);
+        }
+      }
+    },
+    [isLoading, overlayOpen, data]
+  );
 
-  const handleResize = () => {
-    let w = document.body.getBoundingClientRect();
-    console.log('default width :', w.width, 'x', w.height);
-    w = w.width;
-    if (ref && ref.current) {
-      w = ref.current.clientWidth;
-      console.log('ref found, changing default width to :', w);
+  function handleResize() {
+    let w = 600;
+    if (stateRef) {
+      const o = w;
+      w = stateRef.clientWidth;
+      console.log('ref found, changing default width to :', w, 'from :', o);
     }
+    console.log('handling resize : setting chartWidth to :', w);
     setChartWidth(w);
-  }
+  };
 
   useEffect(() => {
     window.addEventListener('resize', handleResize);
-  }, []);
+  });
 
   useEffect(() => {
-    console.log('data changed');
-    if (data && data.length) {
-      console.log('data changed and about to handle resize');
-      handleResize();
+    if (stateRef) {
+      setChartWidth(stateRef.clientWidth);
     }
-  }, [data]);
+  }, [stateRef]);
+
+  // useEffect(() => {
+  //   console.log('data changed');
+  //   if (data && data.length) {
+  //     console.log('data changed and about to handle resize');
+  //     handleResize();
+  //   }
+  // }, [data]);
 
   const handleOnSubmit = async (event) => {
     // Defaults to one years worth (typically) of earnings (referring to count=4)
@@ -59,9 +69,9 @@ function App() {
       setIsLoading(true);
       event.preventDefault();
       await handleOnSubmit(event);
-      console.log('setting overlayopen to false')
+      console.log('setting overlayopen to false');
       setOverlayOpen(false);
-      console.log('setting isLoading to false')
+      console.log('setting isLoading to false');
       setIsLoading(false);
     }
   };
@@ -78,12 +88,12 @@ function App() {
             onSearchClick={(e) => setOverlayOpen(true)}
           />
           <BodyContainer className="mt-2" fluid>
-            <Row>
-              <Col>
+            <Row className="justify-content-center center-me">
+              <Col sm={12} md={8} ref={ref}>
                 {data.map((vibe) => {
                   return (
-                    <Row className="justify-content-center center-me">
-                      <Col xs={8} ref={ref}>
+                    <Row>
+                      <Col>
                         <Card className="mt-5 mb-5">
                           <Card.Header>
                             <Table striped bordered hover responsive>
@@ -140,7 +150,7 @@ function App() {
                 placeholder="ticker"
                 type="text"
                 className="input--fullscreen"
-                onKeyPress={(e) => handleOnKeyPress(e)}
+                onKeyPress={async (e) => await handleOnKeyPress(e)}
               />
             ) : (
               <Spinner
