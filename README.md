@@ -1,6 +1,6 @@
 # Earnings Vibe
 
-[https://earningsvibe.com](https://earnings one.com)
+[https://earningsvibe.com](https://earningsvibe.com)
 
 ### Quickly gauge historical earnings bias
 
