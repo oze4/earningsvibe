@@ -1,7 +1,8 @@
 import 'dotenv/config';
-import path from 'path';
+// import path from 'path';
 import express, { Request, Response } from 'express';
 import helmet from 'helmet';
+import cors from 'cors';
 import { ValidateTimePeriod, ValidateToAndFromQueryParams } from './middleware';
 import { TimePeriod } from './types';
 import FMPCloud from './fmpcloud';
@@ -19,8 +20,12 @@ const appIp = '0.0.0.0';
 // const feStaticAssets = path.join(feBuildPath, '/static');
 
 app.use(express.json());
+app.use(cors({
+  origin: 'earningsvibe.com'
+}));
+
 // app.use(express.urlencoded({ extended: false }));
-// app.use(helmet());
+app.use(helmet());
 
 // Path for frontend static assets
 // app.use('/static', express.static(feStaticAssets));
