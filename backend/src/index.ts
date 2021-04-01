@@ -15,7 +15,7 @@ const fmpcloud = new FMPCloud(process.env.FMPCLOUD_API_KEY);
 const app = express();
 const appPort = Number(process.env.PORT || 8081);
 const appIp = '0.0.0.0';
-const feBuildPath = path.resolve(__dirname, '../../build/frontend');
+// const feBuildPath = path.resolve(__dirname, '../../build/frontend');
 // const feStaticAssets = path.join(feBuildPath, '/static');
 
 app.use(express.json());
