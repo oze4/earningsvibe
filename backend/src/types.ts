@@ -3,7 +3,7 @@ export interface Stock {
   change?: number;
   changeOverTime?: number;
   changePercent?: number;
-  earningsDate?: Date;
+  earningsDate?: Date | undefined;
   label?: string; 
   // Have to rename `changePercent` to `percentChange`,
   // so it plays nice with react-stockcharts

@@ -168,26 +168,38 @@ export default class FMPCloud {
 
       const stockDatas = await Promise.all(stockDataRequests);
 
-      console.log(`stockDatas.length [before] = ${stockDatas.length} : ${stockDatas.map(sd => `\n\tStockData0Date = ${sd[0].date}\n\tEarningsDate = ${sd[0].earningsDate}\n`)}`);
+      console.log(
+        `stockDatas.length [before] = ${stockDatas.length} : ${stockDatas.map(
+          (sd) =>
+            `\n\tStockData0Date = ${sd[0].date}\n\tEarningsDate = ${sd[0].earningsDate}\n`
+        )}`
+      );
 
       const returnData = earnings.map((earning) => {
-        console.log(`Earning Date : ${earning.date}`)
+        console.log(`\nEarning Date : ${earning.date}`);
         let vibe = { earning, stock: [] as Stock[] };
 
         stockDatas.forEach((stockData) => {
           if (!stockData[0].date) throw new Error('stockData is empty!');
 
-          const sdDate = new Date(stockData[0].date);
+          const sdDate = new Date(
+            stockData[0].earningsDate || stockData[0].date
+          );
           if (sdDate === null) throw new Error('sdDate is null');
 
           if (sdDate >= new Date(earning.daysBefore) && sdDate <= new Date(earning.daysAfter)) {
-            console.log(`Setting stock data for earnings ${earning.date}. stockData.length is ${stockData.length}`);
+          // if (sdDate == new Date(earning.date)) {
+            console.log(
+              `\t -YEP!! stockDate = ${sdDate}\n\t\tearningDate = ${new Date(earning.date)}`
+            );
             vibe.stock = stockData;
           } else {
-            if (new Date(earning.date) === new Date("2020-09-08"))
-              console.log(`Unable to set stock data! stock data is from ${sdDate}`)
+            console.log(
+              `\t -NOPE stockDate = ${sdDate}\n\t\tearningDate = ${new Date(earning.date)}`
+            );
           }
         });
+
         return vibe;
       });
 
