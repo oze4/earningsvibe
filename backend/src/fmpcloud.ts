@@ -76,7 +76,7 @@ export default class FMPCloud {
         // the "next" earnings date(s), even though there will be no data.... Sometimes they
         // return one null date, sometimes two, etc... We add a buffer, then slice at the end
         // as to return the requested amount of earnings.
-        String(numberOfPriorEarnings + 5) +
+        String(numberOfPriorEarnings + 2) +
         '&apikey=' +
         this.#apiKey;
 
@@ -170,11 +170,13 @@ export default class FMPCloud {
       const returnData = earnings.map((earning) => {
         console.log(`Earning Date : ${earning.date}`)
         let vibe = { earning, stock: [] as Stock[] };
-        
+
         stockDatas.forEach((stockData) => {
           if (!stockData[0].date) throw new Error('stockData is empty!');
+
           const sdDate = new Date(stockData[0].date);
           if (sdDate === null) throw new Error('sdDate is null');
+
           if (sdDate >= new Date(earning.daysBefore) && sdDate <= new Date(earning.daysAfter)) {
             console.log(`Setting stock data for earnings ${earning.date}. stockData.length is ${stockData.length}`);
             vibe.stock = stockData;
