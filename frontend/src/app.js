@@ -163,7 +163,7 @@ function App() {
                                   >
                                     {!vibe.earning.revenue ||
                                     vibe.earning.revenue <= 0
-                                      ? 'NA'
+                                      ? 'N/A'
                                       : vibe.earning.revenue}
                                   </td>
                                 </tr>
@@ -185,7 +185,7 @@ function App() {
                                 />
                               </div>
                             ) : (
-                              <div>Loading...</div>
+                              <h3>Can't seem to find that. Please try again soon.</h3>
                             )}
                           </Card.Body>
                         </Card>
