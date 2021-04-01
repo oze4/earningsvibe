@@ -112,14 +112,18 @@ function App() {
       {!overlayOpen && data.length > 0 && (
         <Fragment>
           <Topbar
+            fixed="top"
             brand="earningsvibe.com"
             expand="sm"
+            bg="light"
+            variant="light"
             searchPlaceholderText="Ticker"
             onSearchClick={(e) => setOverlayOpen(true)}
           />
-          <BodyContainer className="mt-2" fluid>
+          <BodyContainer style={{ marginTop: '6rem' }} fluid>
             <Row className="justify-content-center center-me">
-              <Col sm={12} md={8} ref={ref}>
+              <Col sm={12} md={10} ref={ref}>
+                {data && data.length > 0 && <h1>{data[0].earning.symbol}</h1>}
                 {data.map((vibe) => {
                   return (
                     <Row>
@@ -129,8 +133,7 @@ function App() {
                             <Table striped bordered hover responsive>
                               <thead>
                                 <tr>
-                                  <th>Symbol</th>
-                                  <th>Date</th>
+                                  <th>Earning Date</th>
                                   <th>EPS Estimate</th>
                                   <th>EPS Actual</th>
                                   <th>Revenue Estimate</th>
@@ -139,12 +142,46 @@ function App() {
                               </thead>
                               <tbody>
                                 <tr>
-                                  <td>{vibe.earning.symbol}</td>
                                   <td>{vibe.earning.date}</td>
-                                  <td>{vibe.earning.epsEstimated}</td>
-                                  <td>{vibe.earning.eps}</td>
-                                  <td>{vibe.earning.revenueEstimated}</td>
-                                  <td>{vibe.earning.revenue}</td>
+                                  <td>
+                                    {!vibe.earning.epsEstimated ||
+                                    vibe.earning.epsEstimated <= 0
+                                      ? 'NA'
+                                      : vibe.earning.epsEstimated}
+                                  </td>
+                                  <td
+                                    style={{
+                                      backgroundColor:
+                                        vibe.earning.eps >
+                                        vibe.earning.epsEstimated
+                                          ? 'rgb(0, 128, 0, 0.1)' // green with 10% opacity
+                                          : 'rgb(255, 0, 0, 0.1)' // red with 10% opacity
+                                    }}
+                                  >
+                                    {!vibe.earning.eps || vibe.earning.eps <= 0
+                                      ? 'NA'
+                                      : vibe.earning.eps}
+                                  </td>
+                                  <td>
+                                    {!vibe.earning.revenueEstimated ||
+                                    vibe.earning.revenueEstimated <= 0
+                                      ? 'NA'
+                                      : vibe.earning.revenueEstimated}
+                                  </td>
+                                  <td
+                                    style={{
+                                      backgroundColor:
+                                        vibe.earning.revenue >
+                                        vibe.earning.revenueEstimated
+                                          ? 'rgb(0, 128, 0, 0.1)' // green with 10% opacity
+                                          : 'rgb(255, 0, 0, 0.1)' // red with 10% opacity
+                                    }}
+                                  >
+                                    {!vibe.earning.revenue ||
+                                    vibe.earning.revenue <= 0
+                                      ? 'NA'
+                                      : vibe.earning.revenue}
+                                  </td>
                                 </tr>
                               </tbody>
                             </Table>

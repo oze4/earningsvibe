@@ -107,8 +107,8 @@ class CandleStickChartWithMA extends Component {
         displayXAccessor={displayXAccessor}
         xExtents={xExtents}
         clamp
-        // panEvent={true}
-        // zoomEvent={false}
+        panEvent={true}
+        zoomEvent={false}
       >
         <Chart
           id={1}

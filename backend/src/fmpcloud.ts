@@ -189,13 +189,13 @@ export default class FMPCloud {
 
           if (sdDate >= new Date(earning.daysBefore) && sdDate <= new Date(earning.daysAfter)) {
           // if (sdDate == new Date(earning.date)) {
-            console.log(
-              `\t -YEP!! stockDate = ${sdDate}\n\t\tearningDate = ${new Date(earning.date)}`
+            console.log('\t-y\n'
+              // `\t -YEP!! stockDate = ${sdDate}\n\t\tearningDate = ${new Date(earning.date)}`
             );
             vibe.stock = stockData;
           } else {
-            console.log(
-              `\t -NOPE stockDate = ${sdDate}\n\t\tearningDate = ${new Date(earning.date)}`
+            console.log('\t-n\n'
+            //  `\t -NOPE stockDate = ${sdDate}\n\t\tearningDate = ${new Date(earning.date)}`
             );
           }
         });
