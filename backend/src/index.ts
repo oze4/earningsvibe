@@ -21,7 +21,7 @@ const appIp = '0.0.0.0';
 
 app.use(express.json());
 app.use(cors({
-  origin: 'https://earningsvibe.com/'
+  origin: 'https://earningsvibe.com'
 }));
 
 // app.use(express.urlencoded({ extended: false }));
