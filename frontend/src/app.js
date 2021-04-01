@@ -171,15 +171,12 @@ function App() {
                           <Card.Body className="p-0">
                             {vibe.stock && vibe.stock.length > 0 ? (
                               <div>
+                                {console.log(vibe.stock.length)}
                                 <CandleStickChartWithMA
                                   type="svg"
                                   height={600}
                                   width={chartWidth}
-                                  data={vibe.stock.sort(
-                                    (a, b) =>
-                                      new Date(a.date).getTime() -
-                                      new Date(b.date).getTime()
-                                  )}
+                                  data={vibe.stock}
                                 />
                               </div>
                             ) : (
