@@ -173,7 +173,8 @@ export default class FMPCloud {
           if (!stockData[0].date) throw new Error('stockData is empty!');
           const sdDate = new Date(stockData[0].date);
           if (sdDate === null) throw new Error('sdDate is null');
-          if (sdDate >= earning.daysBefore && sdDate <= earning.daysAfter) {
+          if (sdDate >= new Date(earning.daysBefore) && sdDate <= new Date(earning.daysAfter)) {
+            console.log(`Setting stock data for earnings ${earning.date}. stockData.length is ${stockData.length}`);
             vibe.stock = stockData;
           }
         });
