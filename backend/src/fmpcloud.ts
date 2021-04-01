@@ -165,18 +165,22 @@ export default class FMPCloud {
 
       const stockDatas = await Promise.all(stockDataRequests);
 
-      console.log(`stockDatas.length = ${stockDatas.length}`);
+      console.log(`stockDatas.length [before] = ${stockDatas.length}`);
 
-      return earnings.map((earning) => {
+      const returnData = earnings.map((earning) => {
         let vibe = { earning, stock: [] as Stock[] };
         stockDatas.forEach((stockData) => {
-          const sdDate = new Date(stockData[0].date || earning.date);
+          if (!stockData[0].date) throw new Error('stockData is empty!');
+          const sdDate = new Date(stockData[0].date);
+          if (sdDate === null) throw new Error('sdDate is null');
           if (sdDate >= earning.daysBefore && sdDate <= earning.daysAfter) {
             vibe.stock = stockData;
           }
         });
         return vibe;
       });
+
+      return returnData;
     } catch (e) {
       console.error(`Error : [VibeCheck] : ${e}`);
       throw e;
