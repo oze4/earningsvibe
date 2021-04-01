@@ -39,24 +39,24 @@ app.use(helmet());
  * Route Example:
  * /api/stock_data/tsla?from=2021-01-01-31&to=2021-02-15&time_period=15min
  */
-app.get(
-  '/api/stock_data/:symbol',
-  [ValidateTimePeriod, ValidateToAndFromQueryParams],
-  async (req: Request, res: Response) => {
-    try {
-      const { symbol } = req.params;
-      const { to = '', from = '', time_period = '1hour' } = req.query;
-      const tp = (time_period as unknown) as TimePeriod;
-      const fromDate = new Date(from.toString());
-      const toDate = new Date(to.toString());
-      const data = await fmpcloud.HistoricalStock(symbol, fromDate, toDate, tp);
-      res.status(200).send(data);
-    } catch (e) {
-      console.log(e);
-      res.status(500).send(NewHTTPError(500, e));
-    }
-  }
-);
+// app.get(
+//   '/api/stock_data/:symbol',
+//   [ValidateTimePeriod, ValidateToAndFromQueryParams],
+//   async (req: Request, res: Response) => {
+//     try {
+//       const { symbol } = req.params;
+//       const { to = '', from = '', time_period = '1hour' } = req.query;
+//       const tp = (time_period as unknown) as TimePeriod;
+//       const fromDate = new Date(from.toString());
+//       const toDate = new Date(to.toString());
+//       const data = await fmpcloud.HistoricalStock(symbol, fromDate, toDate, tp);
+//       res.status(200).send(data);
+//     } catch (e) {
+//       console.log(e);
+//       res.status(500).send(NewHTTPError(500, e));
+//     }
+//   }
+// );
 
 /**
  * Route Example:

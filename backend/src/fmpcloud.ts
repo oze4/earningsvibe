@@ -117,7 +117,8 @@ export default class FMPCloud {
     symbol: string,
     startDate: Date,
     endDate: Date,
-    timePeriod = TimePeriod['1hour']
+    timePeriod = TimePeriod['1hour'],
+    earningsDate: Date
   ): Promise<Stock[]> => {
     try {
       if (timePeriod in TimePeriod === false) {
@@ -138,7 +139,8 @@ export default class FMPCloud {
         this.#apiKey;
 
       const res = await got(url);
-      return JSON.parse(res.body);
+      const stockdata = JSON.parse(res.body);
+      return stockdata.map((sd: Stock) => ({ ...sd, earningsDate }));
     } catch (err) {
       console.log(`Error : [HistoricalStock] : ${err}`);
       throw err;
@@ -159,13 +161,14 @@ export default class FMPCloud {
           e.symbol,
           e.daysBefore,
           e.daysAfter,
-          TimePeriod['1min']
+          TimePeriod['1min'],
+          e.date
         );
       });
 
       const stockDatas = await Promise.all(stockDataRequests);
 
-      console.log(`stockDatas.length [before] = ${stockDatas.length} : ${stockDatas.map(sd => sd[0].date)}`);
+      console.log(`stockDatas.length [before] = ${stockDatas.length} : ${stockDatas.map(sd => `\n\tStockData0Date = ${sd[0].date}\n\tEarningsDate = ${sd[0].earningsDate}\n`)}`);
 
       const returnData = earnings.map((earning) => {
         console.log(`Earning Date : ${earning.date}`)
