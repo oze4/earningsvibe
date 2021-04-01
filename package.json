@@ -7,7 +7,7 @@
   "license": "MIT",
   "scripts": {
     "start:front": "yarn --cwd frontend start",
-    "build:front": "yarn --cwd frontend build",
+    "build:front": "yarn --cwd frontend build && echo 'earningsvibe.com' >> docs/CNAME",
     "install:front": "yarn --cwd frontend install",
     "start:back": "nodemon --watch 'backend' --exec 'ts-node' --project backend/tsconfig.json --log-error backend/src/index.ts",
     "build:back": "tsc --project backend/tsconfig.json",
