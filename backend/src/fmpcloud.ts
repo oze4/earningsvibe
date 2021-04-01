@@ -165,11 +165,12 @@ export default class FMPCloud {
 
       const stockDatas = await Promise.all(stockDataRequests);
 
-      console.log(`stockDatas.length [before] = ${stockDatas.length}`);
+      console.log(`stockDatas.length [before] = ${stockDatas.length} : ${stockDatas.map(sd => sd[0].date)}`);
 
       const returnData = earnings.map((earning) => {
         console.log(`Earning Date : ${earning.date}`)
         let vibe = { earning, stock: [] as Stock[] };
+        
         stockDatas.forEach((stockData) => {
           if (!stockData[0].date) throw new Error('stockData is empty!');
           const sdDate = new Date(stockData[0].date);
