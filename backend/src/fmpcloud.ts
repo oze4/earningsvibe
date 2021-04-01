@@ -168,6 +168,7 @@ export default class FMPCloud {
       console.log(`stockDatas.length [before] = ${stockDatas.length}`);
 
       const returnData = earnings.map((earning) => {
+        console.log(`Earning Date : ${earning.date}`)
         let vibe = { earning, stock: [] as Stock[] };
         stockDatas.forEach((stockData) => {
           if (!stockData[0].date) throw new Error('stockData is empty!');
