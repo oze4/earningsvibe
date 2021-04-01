@@ -21,11 +21,6 @@ function App() {
     (node) => {
       if (!isLoading && !overlayOpen && data) {
         if (node) {
-          console.log(
-            'useCallback setting client width to',
-            node.clientWidth,
-            'from :'
-          );
           setStateRef(node);
         }
       }
@@ -36,11 +31,8 @@ function App() {
   function handleResize() {
     let w = 600;
     if (stateRef) {
-      const o = w;
       w = stateRef.clientWidth;
-      console.log('ref found, changing default width to :', w, 'from :', o);
     }
-    console.log('handling resize : setting chartWidth to :', w);
     setChartWidth(w);
   }
 
@@ -53,14 +45,6 @@ function App() {
       setChartWidth(stateRef.clientWidth);
     }
   }, [stateRef]);
-
-  // useEffect(() => {
-  //   console.log('data changed');
-  //   if (data && data.length) {
-  //     console.log('data changed and about to handle resize');
-  //     handleResize();
-  //   }
-  // }, [data]);
 
   const handleOnSubmit = async (event) => {
     // Defaults to one years worth (typically) of earnings (referring to count=4)
@@ -109,7 +93,7 @@ function App() {
         </Row>
       </Overlay>
       {/* If the overlay is open, don't show anything behind it */}
-      {!overlayOpen && data.length > 0 && (
+      {!overlayOpen && !isLoading && (
         <Fragment>
           <Topbar
             fixed="top"
@@ -128,7 +112,7 @@ function App() {
                   return (
                     <Row>
                       <Col>
-                        <Card className="mt-5 mb-5">
+                        <Card className="mt-4 mb-4">
                           <Card.Header>
                             <Table striped bordered hover responsive>
                               <thead>
@@ -146,7 +130,7 @@ function App() {
                                   <td>
                                     {!vibe.earning.epsEstimated ||
                                     vibe.earning.epsEstimated <= 0
-                                      ? 'NA'
+                                      ? 'N/A'
                                       : vibe.earning.epsEstimated}
                                   </td>
                                   <td
@@ -159,13 +143,13 @@ function App() {
                                     }}
                                   >
                                     {!vibe.earning.eps || vibe.earning.eps <= 0
-                                      ? 'NA'
+                                      ? 'N/A'
                                       : vibe.earning.eps}
                                   </td>
                                   <td>
                                     {!vibe.earning.revenueEstimated ||
                                     vibe.earning.revenueEstimated <= 0
-                                      ? 'NA'
+                                      ? 'N/A'
                                       : vibe.earning.revenueEstimated}
                                   </td>
                                   <td
