@@ -9,7 +9,7 @@
     "start:front": "yarn --cwd frontend start",
     "build:front": "yarn --cwd frontend build",
     "install:front": "yarn --cwd frontend install",
-    "start:back": "nodemon --watch 'backend' --exec 'ts-node' --project backend/tsconfig.json --log-error backend/index.ts",
+    "start:back": "nodemon --watch 'backend' --exec 'ts-node' --project backend/tsconfig.json --log-error backend/src/index.ts",
     "build:back": "tsc --project backend/tsconfig.json",
     "build": "yarn build:back",
     "start:dev": "yarn build && node build/backend/index.js",

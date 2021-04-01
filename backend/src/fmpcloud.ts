@@ -164,10 +164,13 @@ export default class FMPCloud {
       });
 
       const stockDatas = await Promise.all(stockDataRequests);
+
+      console.log(`stockDatas.length = ${stockDatas.length}`);
+
       return earnings.map((earning) => {
         let vibe = { earning, stock: [] as Stock[] };
         stockDatas.forEach((stockData) => {
-          const sdDate = new Date(stockData[0].date);
+          const sdDate = new Date(stockData[0].date || earning.date);
           if (sdDate >= earning.daysBefore && sdDate <= earning.daysAfter) {
             vibe.stock = stockData;
           }

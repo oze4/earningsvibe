@@ -109,7 +109,7 @@ function App() {
         </Row>
       </Overlay>
       {/* If the overlay is open, don't show anything behind it */}
-      {!overlayOpen && data.length && (
+      {!overlayOpen && data.length > 0 && (
         <Fragment>
           <Topbar
             brand="earningsvibe.com"
@@ -150,16 +150,22 @@ function App() {
                             </Table>
                           </Card.Header>
                           <Card.Body className="p-0">
-                            <CandleStickChartWithMA
-                              type="svg"
-                              height={600}
-                              width={chartWidth}
-                              data={vibe.stock.sort(
-                                (a, b) =>
-                                  new Date(a.date).getTime() -
-                                  new Date(b.date).getTime()
-                              )}
-                            />
+                            {vibe.stock && vibe.stock.length > 0 ? (
+                              <div>
+                                <CandleStickChartWithMA
+                                  type="svg"
+                                  height={600}
+                                  width={chartWidth}
+                                  data={vibe.stock.sort(
+                                    (a, b) =>
+                                      new Date(a.date).getTime() -
+                                      new Date(b.date).getTime()
+                                  )}
+                                />
+                              </div>
+                            ) : (
+                              <div>Loading...</div>
+                            )}
                           </Card.Body>
                         </Card>
                       </Col>
