@@ -162,40 +162,24 @@ export default class FMPCloud {
           e.daysBefore,
           e.daysAfter,
           TimePeriod['1min'],
-          e.date
+          e.date // this is a hack
         );
       });
 
       const stockDatas = await Promise.all(stockDataRequests);
 
-      const returnData = earnings.map((earning) => {
-        console.log(`\nEarning Date : ${earning.date} : Before : ${earning.daysBefore} : After : ${earning.daysAfter}`);
+      return earnings.map((earning) => {
         let vibe = { earning, stock: [] as Stock[] };
-
         stockDatas.forEach((stockData) => {
-          if (!stockData[0].date) throw new Error('stockData date is empty!');
-          if (!stockData[0].earningsDate) throw new Error('stockData earningsDate is empty');
-
-          const sdDate = stockData[0].earningsDate && new Date(stockData[0].earningsDate);
-          if (sdDate === null) throw new Error('sdDate is null');
-
-          // if (sdDate >= new Date(earning.daysBefore) && sdDate <= new Date(earning.daysAfter)) {
-          if (sdDate == new Date(earning.date)) {
-            console.log('\t-y\n'
-              // `\t -YEP!! stockDate = ${sdDate}\n\t\tearningDate = ${new Date(earning.date)}`
-            );
+          if (!stockData[0].earningsDate) {
+            throw new Error('stockData[0].earningsDate is empty');
+          }
+          if (stockData[0].earningsDate.valueOf() === earning.date.valueOf()) {
             vibe.stock = stockData;
-          } else {
-            console.log('\t-n\n'
-            //  `\t -NOPE stockDate = ${sdDate}\n\t\tearningDate = ${new Date(earning.date)}`
-            );
           }
         });
-
         return vibe;
       });
-
-      return returnData;
     } catch (e) {
       console.error(`Error : [VibeCheck] : ${e}`);
       throw e;
