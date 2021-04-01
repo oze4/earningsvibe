@@ -16,19 +16,19 @@ const app = express();
 const appPort = Number(process.env.PORT || 8081);
 const appIp = '0.0.0.0';
 const feBuildPath = path.resolve(__dirname, '../../build/frontend');
-const feStaticAssets = path.join(feBuildPath, '/static');
+// const feStaticAssets = path.join(feBuildPath, '/static');
 
 app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
-app.use(helmet());
+// app.use(express.urlencoded({ extended: false }));
+// app.use(helmet());
 
 // Path for frontend static assets
-app.use('/static', express.static(feStaticAssets));
+// app.use('/static', express.static(feStaticAssets));
 
-app.get('/', (_req: Request, res: Response) => {
-  const html = path.resolve(__dirname, `${feBuildPath}/index.html`);
-  res.sendFile(html);
-});
+// app.get('/', (_req: Request, res: Response) => {
+//   const html = path.resolve(__dirname, `${feBuildPath}/index.html`);
+//   res.sendFile(html);
+// });
 
 /**
  * Route Example:

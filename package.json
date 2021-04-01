@@ -11,11 +11,10 @@
     "install:front": "yarn --cwd frontend install",
     "start:back": "nodemon --watch 'backend' --exec 'ts-node' --project backend/tsconfig.json --log-error backend/index.ts",
     "build:back": "tsc --project backend/tsconfig.json",
-    "build": "yarn build:front && yarn build:back",
+    "build": "yarn build:back",
     "start:dev": "yarn build && node build/backend/index.js",
     "start": "node build/backend/index.js",
-    "format": "prettier --write \"**/*.+(js|jsx|json|css|md)\"",
-    "heroku-prebuild": "yarn install:front"
+    "format": "prettier --write \"**/*.+(js|jsx|json|css|md)\""
   },
   "dependencies": {
     "@types/dotenv": "^8.2.0",
