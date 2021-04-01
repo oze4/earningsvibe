@@ -179,8 +179,8 @@ export default class FMPCloud {
           const sdDate = stockData[0].earningsDate && new Date(stockData[0].earningsDate);
           if (sdDate === null) throw new Error('sdDate is null');
 
-          if (sdDate >= new Date(earning.daysBefore) && sdDate <= new Date(earning.daysAfter)) {
-          // if (sdDate == new Date(earning.date)) {
+          // if (sdDate >= new Date(earning.daysBefore) && sdDate <= new Date(earning.daysAfter)) {
+          if (sdDate == new Date(earning.date)) {
             console.log('\t-y\n'
               // `\t -YEP!! stockDate = ${sdDate}\n\t\tearningDate = ${new Date(earning.date)}`
             );

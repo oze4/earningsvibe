@@ -59,9 +59,7 @@ function App() {
       setIsLoading(true);
       event.preventDefault();
       await handleOnSubmit(event);
-      console.log('setting overlayopen to false');
       setOverlayOpen(false);
-      console.log('setting isLoading to false');
       setIsLoading(false);
     }
   };
