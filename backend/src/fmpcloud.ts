@@ -176,6 +176,9 @@ export default class FMPCloud {
           if (sdDate >= new Date(earning.daysBefore) && sdDate <= new Date(earning.daysAfter)) {
             console.log(`Setting stock data for earnings ${earning.date}. stockData.length is ${stockData.length}`);
             vibe.stock = stockData;
+          } else {
+            if (new Date(earning.date) === new Date("2020-09-08"))
+              console.log(`Unable to set stock data! stock data is from ${sdDate}`)
           }
         });
         return vibe;
