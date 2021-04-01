@@ -8,6 +8,8 @@ import {
   CandleStickChartWithMA
 } from './components';
 
+const BASE_API_URL = 'https://earningsvibe.herokuapp.com';
+
 function App() {
   const [data, setData] = useState(undefined);
   const [overlayOpen, setOverlayOpen] = useState(true);
@@ -19,7 +21,11 @@ function App() {
     (node) => {
       if (!isLoading && !overlayOpen && data) {
         if (node) {
-          console.log('useCallback setting client width to', node.clientWidth, 'from :', );
+          console.log(
+            'useCallback setting client width to',
+            node.clientWidth,
+            'from :'
+          );
           setStateRef(node);
         }
       }
@@ -36,7 +42,7 @@ function App() {
     }
     console.log('handling resize : setting chartWidth to :', w);
     setChartWidth(w);
-  };
+  }
 
   useEffect(() => {
     window.addEventListener('resize', handleResize);
@@ -58,7 +64,7 @@ function App() {
 
   const handleOnSubmit = async (event) => {
     // Defaults to one years worth (typically) of earnings (referring to count=4)
-    const url = `/api/vibe_check?symbol=${event.target.value}&count=4`;
+    const url = `${BASE_API_URL}/api/vibe_check?symbol=${event.target.value}&count=4`;
     const resp = await fetch(url);
     const json = await resp.json();
     setData(json);
@@ -78,6 +84,30 @@ function App() {
 
   return (
     <Container fluid className="pl-0 pr-0 bg-gray">
+      <Overlay isOpen={overlayOpen} hasCloseButton={false}>
+        <Row className="justify-content-center center-me">
+          <Col xs className="ml-5 mr-5">
+            {!isLoading && overlayOpen ? (
+              <input
+                spellCheck={false}
+                placeholder="ticker"
+                type="text"
+                className="input--fullscreen"
+                onKeyPress={async (e) => await handleOnKeyPress(e)}
+              />
+            ) : (
+              <Spinner
+                variant="light"
+                className="justify-content-end"
+                animation="border"
+                role="status"
+              >
+                <span className="sr-only">Loading...</span>
+              </Spinner>
+            )}
+          </Col>
+        </Row>
+      </Overlay>
       {/* If the overlay is open, don't show anything behind it */}
       {!overlayOpen && data.length && (
         <Fragment>
@@ -141,30 +171,6 @@ function App() {
           </BodyContainer>
         </Fragment>
       )}
-      <Overlay isOpen={overlayOpen} hasCloseButton={false}>
-        <Row className="justify-content-center center-me">
-          <Col xs className="ml-5 mr-5">
-            {!isLoading && overlayOpen ? (
-              <input
-                spellCheck={false}
-                placeholder="ticker"
-                type="text"
-                className="input--fullscreen"
-                onKeyPress={async (e) => await handleOnKeyPress(e)}
-              />
-            ) : (
-              <Spinner
-                variant="light"
-                className="justify-content-end"
-                animation="border"
-                role="status"
-              >
-                <span className="sr-only">Loading...</span>
-              </Spinner>
-            )}
-          </Col>
-        </Row>
-      </Overlay>
     </Container>
   );
 }
