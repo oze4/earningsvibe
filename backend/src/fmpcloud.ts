@@ -76,7 +76,7 @@ export default class FMPCloud {
         // the "next" earnings date(s), even though there will be no data.... Sometimes they
         // return one null date, sometimes two, etc... We add a buffer, then slice at the end
         // as to return the requested amount of earnings.
-        String(numberOfPriorEarnings + 2) +
+        String(numberOfPriorEarnings + 5) +
         '&apikey=' +
         this.#apiKey;
 
@@ -93,8 +93,8 @@ export default class FMPCloud {
             const d = new Date(e.date);
             return {
               ...e,
-              daysAfter: getRelativeDate(BeforeOrAfter.after, 2, d),
-              daysBefore: getRelativeDate(BeforeOrAfter.before, 2, d)
+              daysAfter: getRelativeDate(BeforeOrAfter.after, 1, d),
+              daysBefore: getRelativeDate(BeforeOrAfter.before, 1, d)
             };
           })
           // Only return requested amount of earnings
@@ -140,7 +140,10 @@ export default class FMPCloud {
 
       const res = await got(url);
       const stockdata = JSON.parse(res.body);
-      return stockdata.map((sd: Stock) => ({ ...sd, earningsDate }));
+
+      return stockdata
+        .map((sd: Stock) => ({ ...sd, earningsDate }))
+        .sort((a: Stock, b: Stock) => new Date(a.date).getTime() - new Date(b.date).getTime());
     } catch (err) {
       console.log(`Error : [HistoricalStock] : ${err}`);
       throw err;
