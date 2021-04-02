@@ -48,7 +48,7 @@ function App() {
 
   const handleOnSubmit = async (event) => {
     // Defaults to one years worth (typically) of earnings (referring to count=4)
-    const url = `${BASE_API_URL}/api/vibe_check?symbol=${event.target.value}&count=4`;
+    const url = `${BASE_API_URL}/api/vibe_check?symbol=${event.target.value}&count=10`;
     const resp = await fetch(url);
     const json = await resp.json();
     setData(json);
@@ -176,7 +176,11 @@ function App() {
                                   type="svg"
                                   height={600}
                                   width={chartWidth}
-                                  data={vibe.stock}
+                                  data={vibe.stock.sort(
+                                    (a, b) =>
+                                      new Date(a.date).getTime() -
+                                      new Date(b.date).getTime()
+                                  )}
                                 />
                               </div>
                             ) : (

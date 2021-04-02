@@ -76,30 +76,21 @@ export default class FMPCloud {
         // the "next" earnings date(s), even though there will be no data.... Sometimes they
         // return one null date, sometimes two, etc... We add a buffer, then slice at the end
         // as to return the requested amount of earnings.
-        String(numberOfPriorEarnings + 5) +
+        String(numberOfPriorEarnings) +
         '&apikey=' +
         this.#apiKey;
 
       const r = await got(url);
       const earnings: Earnings[] = JSON.parse(r.body);
 
-      return (
-        earnings
-          // fmpcloud will give us future earnings, even though the objects will not contain data.
-          // We only care about earnings that have already been reported.
-          .filter((e: Earnings) => e.eps !== null)
-          // Add start and end dates to each Earning object
-          .map((e) => {
-            const d = new Date(e.date);
-            return {
-              ...e,
-              daysAfter: getRelativeDate(BeforeOrAfter.after, 1, d),
-              daysBefore: getRelativeDate(BeforeOrAfter.before, 1, d)
-            };
-          })
-          // Only return requested amount of earnings
-          .slice(0, numberOfPriorEarnings)
-      );
+      return earnings.map((e) => {
+        const d = new Date(e.date);
+        return {
+          ...e,
+          daysAfter: new Date(getRelativeDate(BeforeOrAfter.after, 1, d)),
+          daysBefore: new Date(getRelativeDate(BeforeOrAfter.before, 1, d))
+        };
+      });
     } catch (e) {
       console.log('Error : HistoricalEarnings : ', e);
       throw e;
@@ -140,10 +131,9 @@ export default class FMPCloud {
 
       const res = await got(url);
       const stockdata = JSON.parse(res.body);
-
       return stockdata
         .map((sd: Stock) => ({ ...sd, earningsDate }))
-        .sort((a: Stock, b: Stock) => new Date(a.date).getTime() - new Date(b.date).getTime());
+        .sort()
     } catch (err) {
       console.log(`Error : [HistoricalStock] : ${err}`);
       throw err;
@@ -174,10 +164,18 @@ export default class FMPCloud {
       return earnings.map((earning) => {
         let vibe = { earning, stock: [] as Stock[] };
         stockDatas.forEach((stockData) => {
-          stockData.map(sd => sd.date).join(', ');
+          stockData.map((sd) => sd.date).join(', ');
+          stockData;
           const stockDataDate = new Date(stockData[0].date);
-          console.log(`${stockDataDate.valueOf()} >= ${earning.daysBefore.valueOf()} && ${stockDataDate.valueOf()} <= ${earning.daysAfter.valueOf()}`, stockDataDate.valueOf() >= earning.daysBefore.valueOf(), stockDataDate.valueOf() <= earning.daysAfter.valueOf())
-          if (stockDataDate.valueOf() >= earning.daysBefore.valueOf() && stockDataDate.valueOf() <= earning.daysAfter.valueOf()) {
+          console.log(
+            `${stockDataDate.valueOf()} >= ${earning.daysBefore.valueOf()} && ${stockDataDate.valueOf()} <= ${earning.daysAfter.valueOf()}`,
+            stockDataDate.valueOf() >= earning.daysBefore.valueOf(),
+            stockDataDate.valueOf() <= earning.daysAfter.valueOf()
+          );
+          if (
+            stockDataDate.valueOf() >= earning.daysBefore.valueOf() &&
+            stockDataDate.valueOf() <= earning.daysAfter.valueOf()
+          ) {
             vibe.stock = stockData;
           }
         });
