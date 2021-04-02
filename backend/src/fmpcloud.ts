@@ -162,8 +162,6 @@ export default class FMPCloud {
       return earnings.map((earning) => {
         let vibe = { earning, stock: [] as Stock[] };
         stockDatas.forEach((stockData) => {
-          stockData.map((sd) => sd.date).join(', ');
-          stockData;
           const stockDataDate = new Date(stockData[0].date);
           console.log(
             `${stockDataDate.valueOf()} >= ${earning.daysBefore.valueOf()} && ${stockDataDate.valueOf()} <= ${earning.daysAfter.valueOf()}`,
