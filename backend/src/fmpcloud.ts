@@ -131,9 +131,7 @@ export default class FMPCloud {
 
       const res = await got(url);
       const stockdata = JSON.parse(res.body);
-      return stockdata
-        .map((sd: Stock) => ({ ...sd, earningsDate }))
-        .sort()
+      return stockdata.sort();
     } catch (err) {
       console.log(`Error : [HistoricalStock] : ${err}`);
       throw err;
