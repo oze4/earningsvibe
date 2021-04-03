@@ -133,7 +133,7 @@ app.get('/api/vibe_check', async (req, res) => {
     res.status(200).send(data);
   } catch (e) {
     console.log(e);
-    res.status(500).send(NewHTTPError(500, e));
+    res.status(500).send({ status: 500, message: `${e}` });
   }
 });
 
