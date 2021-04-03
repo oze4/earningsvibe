@@ -1,6 +1,13 @@
 import got from 'got';
-import { Earnings, BeforeOrAfter, Stock, TimePeriod } from './types';
+import {
+  Earnings,
+  BeforeOrAfter,
+  Stock,
+  TimePeriod,
+  EarningsVibe
+} from './types';
 import { getRelativeDate } from './utils';
+import e from 'express';
 
 /**
  * FMPCloud allows you to interact with the fmpcloud.io API
@@ -147,37 +154,71 @@ export default class FMPCloud {
   VibeCheck = async (symbol: string, count = 4): Promise<any> => {
     try {
       const earnings = await this.HistoricalEarnings(symbol, count);
-      const stockDataRequests = earnings.map((e) => {
-        return this.HistoricalStock(
-          e.symbol,
-          e.daysBefore,
-          e.daysAfter,
-          TimePeriod['1min'],
-          e.date // this is a hack
+
+      const promises: Promise<Stock[]>[] = [];
+      earnings.forEach((e) => {
+        promises.push(
+          this.HistoricalStock(
+            e.symbol,
+            e.daysBefore,
+            e.daysAfter,
+            TimePeriod['1min'],
+            e.date // this is a hack
+          )
         );
       });
 
-      const stockDatas = await Promise.all(stockDataRequests);
+      const stockDataArrayOfArrays = await Promise.all(promises);
 
-      return earnings.map((earning) => {
-        let vibe = { earning, stock: [] as Stock[] };
-        stockDatas.forEach((stockData) => {
-          if (!stockData[0].date) throw new Error('stockData[0].date is null');
-          const stockDataDate = new Date(stockData[0].date);
-          console.log(
-            `${stockDataDate.valueOf()} >= ${earning.daysBefore.valueOf()} && ${stockDataDate.valueOf()} <= ${earning.daysAfter.valueOf()}`,
-            stockDataDate.valueOf() >= earning.daysBefore.valueOf(),
-            stockDataDate.valueOf() <= earning.daysAfter.valueOf()
-          );
-          if (
-            stockDataDate.valueOf() >= earning.daysBefore.valueOf() &&
-            stockDataDate.valueOf() <= earning.daysAfter.valueOf()
-          ) {
-            vibe.stock = stockData;
+      const finalData: EarningsVibe[] = [];
+
+      stockDataArrayOfArrays.forEach((stockDataArray) => {
+        const firstStockData = stockDataArray[0];
+        if (firstStockData && firstStockData.date) {
+          const firstStockDataDate = new Date(firstStockData.date).valueOf();
+
+          const foundEarnings = earnings.find((e) => {
+            const start = new Date(e.daysBefore).valueOf();
+            const end = new Date(e.daysAfter).valueOf();
+            if (firstStockDataDate >= start && firstStockDataDate <= end) {
+              return e;
+            }
+          });
+          if (foundEarnings) {
+            finalData.push({
+              earnings: foundEarnings,
+              stock: stockDataArray.sort(
+                (a, b) =>
+                  new Date(a.date).getTime() - new Date(b.date).getTime()
+              )
+            });
           }
-        });
-        return vibe;
+        }
       });
+
+      return finalData;
+
+      // return earnings.map((earning) => {
+      //   let vibe = { earning, stock: [] as Stock[] };
+      //   stockDataArrayOfArrays.forEach((stockData) => {
+      //     console.log({ stockDataZero: stockData[0] });
+      //     if (!stockData || stockData.length <= 0 || !stockData[0].date)
+      //       throw new Error('stockData[0].date is null');
+      //     const stockDataDate = new Date(stockData[0].date);
+      //     console.log(
+      //       `${stockDataDate.valueOf()} >= ${earning.daysBefore.valueOf()} && ${stockDataDate.valueOf()} <= ${earning.daysAfter.valueOf()}`,
+      //       stockDataDate.valueOf() >= earning.daysBefore.valueOf(),
+      //       stockDataDate.valueOf() <= earning.daysAfter.valueOf()
+      //     );
+      //     if (
+      //       stockDataDate.valueOf() >= earning.daysBefore.valueOf() &&
+      //       stockDataDate.valueOf() <= earning.daysAfter.valueOf()
+      //     ) {
+      //       vibe.stock = stockData;
+      //     }
+      //   });
+      //   return vibe;
+      // });
     } catch (e) {
       console.error(`Error : [VibeCheck] : ${e}`);
       throw e;

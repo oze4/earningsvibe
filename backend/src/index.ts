@@ -8,6 +8,8 @@ import { TimePeriod } from './types';
 import FMPCloud from './fmpcloud';
 import { NewHTTPError } from './errors';
 
+import { Stock } from './types';
+
 if (!process.env.FMPCLOUD_API_KEY) {
   throw new Error('Missing FMPCLOUD_API_KEY env var!');
 }
@@ -20,9 +22,11 @@ const appIp = '0.0.0.0';
 // const feStaticAssets = path.join(feBuildPath, '/static');
 
 app.use(express.json());
-app.use(cors({
-  origin: '*'
-}));
+app.use(
+  cors({
+    origin: '*'
+  })
+);
 
 // app.use(express.urlencoded({ extended: false }));
 app.use(helmet());
@@ -39,24 +43,53 @@ app.use(helmet());
  * Route Example:
  * /api/stock_data/tsla?from=2021-01-01-31&to=2021-02-15&time_period=15min
  */
-// app.get(
-//   '/api/stock_data/:symbol',
-//   [ValidateTimePeriod, ValidateToAndFromQueryParams],
-//   async (req: Request, res: Response) => {
-//     try {
-//       const { symbol } = req.params;
-//       const { to = '', from = '', time_period = '1hour' } = req.query;
-//       const tp = (time_period as unknown) as TimePeriod;
-//       const fromDate = new Date(from.toString());
-//       const toDate = new Date(to.toString());
-//       const data = await fmpcloud.HistoricalStock(symbol, fromDate, toDate, tp);
-//       res.status(200).send(data);
-//     } catch (e) {
-//       console.log(e);
-//       res.status(500).send(NewHTTPError(500, e));
-//     }
-//   }
-// );
+app.get(
+  '/api/stock_data/:symbol',
+  [ValidateTimePeriod, ValidateToAndFromQueryParams],
+  async (req: Request, res: Response) => {
+    try {
+      const { symbol } = req.params;
+      const { to = '', from = '', time_period = '1hour' } = req.query;
+      const tp = (time_period as unknown) as TimePeriod;
+      const fromDate = new Date(from.toString());
+      const toDate = new Date(to.toString());
+      const data = await fmpcloud.HistoricalStock(
+        symbol,
+        fromDate,
+        toDate,
+        tp,
+        new Date(Date.now())
+      );
+      res.status(200).send(data);
+    } catch (e) {
+      console.log(e);
+      res.status(500).send(NewHTTPError(500, e));
+    }
+  }
+);
+
+app.get('/api/test', async (req: Request, res: Response) => {
+  try {
+    const tickers = ['TSLA', 'MSFT', 'AAPL', 'ROKU'];
+    const promises: Promise<Stock[]>[] = [];
+    tickers.forEach((ticker) => {
+      promises.push(
+        fmpcloud.HistoricalStock(
+          ticker,
+          new Date('3/20/2019'),
+          new Date('3/25/2019'),
+          TimePeriod['1min'],
+          new Date(Date.now())
+        )
+      );
+    });
+    const results = await Promise.all(promises);
+    res.status(200).send(results);
+  } catch (e) {
+    console.log(`Error : [/test] : ${e}`);
+    res.status(500).send({ status: 500, error: e });
+  }
+});
 
 /**
  * Route Example:
@@ -71,7 +104,10 @@ app.get('/api/earnings_data/:symbol', async (req: Request, res: Response) => {
   try {
     const { symbol } = req.params;
     const { count = 4 } = req.query;
-    const data = await fmpcloud.HistoricalEarnings(symbol.toUpperCase(), Number(count));
+    const data = await fmpcloud.HistoricalEarnings(
+      symbol.toUpperCase(),
+      Number(count)
+    );
     res.status(200).send(data);
   } catch (e) {
     console.log(e);
@@ -82,9 +118,9 @@ app.get('/api/earnings_data/:symbol', async (req: Request, res: Response) => {
 /**
  * Route Example:
  * /api/vibe_check?symbol=tsla&count=10
- * 
+ *
  * The example above will vibe check the previous 10 earnings
- * 
+ *
  * Notes:
  *  - If no count query param is proided, we default to 4 prior earnings (typically ~1 years worth)
  */
@@ -95,7 +131,7 @@ app.get('/api/vibe_check', async (req, res) => {
     res.status(200).send(data);
   } catch (e) {
     console.log(e);
-    res.status(500).send(NewHTTPError(500, e)); 
+    res.status(500).send(NewHTTPError(500, e));
   }
 });
 
