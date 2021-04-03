@@ -177,6 +177,7 @@ export default class FMPCloud {
       let finalData: EarningsVibe[] = [];
 
       stockDataArrayOfArrays.forEach((stockDataArray) => {
+        console.log(`found ${stockDataArray.length} 1min candles`);
         const firstStockData = stockDataArray[0];
         if (firstStockData && firstStockData.date) {
           const firstStockDataDate = new Date(firstStockData.date).valueOf();

@@ -128,6 +128,7 @@ app.get('/api/vibe_check', async (req, res) => {
   try {
     const { symbol = '', count = 4 } = req.query;
     const data = await fmpcloud.VibeCheck(symbol.toString(), Number(count));
+    if (data.length <= 0) throw new Error('there should be data here');
     res.status(200).send(data);
   } catch (e) {
     console.log(e);
