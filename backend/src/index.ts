@@ -111,7 +111,7 @@ app.get('/api/earnings_data/:symbol', async (req: Request, res: Response) => {
     res.status(200).send(data);
   } catch (e) {
     console.log(e);
-    res.status(500).send({ status: 500, message: e });
+    res.status(500).send(`${e}`);
   }
 });
 
