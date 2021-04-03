@@ -155,6 +155,8 @@ export default class FMPCloud {
     try {
       const earnings = await this.HistoricalEarnings(symbol, count);
 
+      console.log(`got earnings : count = ${earnings.length}`);
+
       const promises: Promise<Stock[]>[] = [];
       earnings.forEach((e) => {
         promises.push(
@@ -170,19 +172,20 @@ export default class FMPCloud {
 
       const stockDataArrayOfArrays = await Promise.all(promises);
 
+      console.log(`got stock data : count = ${stockDataArrayOfArrays.length}`);
+
       const finalData: EarningsVibe[] = [];
 
       stockDataArrayOfArrays.forEach((stockDataArray) => {
         const firstStockData = stockDataArray[0];
         if (firstStockData && firstStockData.date) {
+          console.log(`found first stock data : ${new Date(firstStockData.date)}`);
           const firstStockDataDate = new Date(firstStockData.date).valueOf();
 
           const foundEarnings = earnings.find((e) => {
             const start = new Date(e.daysBefore).valueOf();
             const end = new Date(e.daysAfter).valueOf();
-            if (firstStockDataDate >= start && firstStockDataDate <= end) {
-              return e;
-            }
+            return firstStockDataDate >= start && firstStockDataDate <= end;
           });
           if (foundEarnings) {
             finalData.push({
