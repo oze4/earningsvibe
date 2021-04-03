@@ -174,20 +174,26 @@ export default class FMPCloud {
 
       console.log(`got stock data : count = ${stockDataArrayOfArrays.length}`);
 
-      const finalData: EarningsVibe[] = [];
+      let finalData: EarningsVibe[] = [];
 
       stockDataArrayOfArrays.forEach((stockDataArray) => {
         const firstStockData = stockDataArray[0];
         if (firstStockData && firstStockData.date) {
-          console.log(`found first stock data : ${new Date(firstStockData.date)}`);
           const firstStockDataDate = new Date(firstStockData.date).valueOf();
+          console.log(`\nfound first stock data : ${new Date(firstStockDataDate)}`);
 
           const foundEarnings = earnings.find((e) => {
             const start = new Date(e.daysBefore).valueOf();
             const end = new Date(e.daysAfter).valueOf();
-            return firstStockDataDate >= start && firstStockDataDate <= end;
+            let isearnings = false;
+            if (firstStockDataDate >= start && firstStockDataDate <= end) {
+              isearnings = true;
+            }
+            return isearnings;
           });
+
           if (foundEarnings) {
+            console.log(`found earnings for stock data! : ${firstStockDataDate}`)
             finalData.push({
               earnings: foundEarnings,
               stock: stockDataArray.sort(
