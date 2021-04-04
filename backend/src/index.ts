@@ -46,25 +46,17 @@ app.use(helmet());
 app.get(
   '/api/stock_data/:symbol',
   [ValidateTimePeriod, ValidateToAndFromQueryParams],
-  async (req: Request, res: Response) => {
-    try {
-      const { symbol } = req.params;
-      const { to = '', from = '', time_period = '1hour' } = req.query;
-      const tp = (time_period as unknown) as TimePeriod;
-      const fromDate = new Date(from.toString());
-      const toDate = new Date(to.toString());
-      const data = await fmpcloud.HistoricalStock(
-        symbol,
-        fromDate,
-        toDate,
-        tp,
-        new Date(Date.now())
-      );
-      res.status(200).send(data);
-    } catch (e) {
-      console.log(e);
-      res.status(500).send(NewHTTPError(500, e));
-    }
+  (req: Request, res: Response) => {
+    const { symbol } = req.params;
+    const { to = '', from = '', time_period = '1hour' } = req.query;
+    const tp = (time_period as unknown) as TimePeriod;
+    const fromDate = new Date(from.toString());
+    const toDate = new Date(to.toString());
+    
+    fmpcloud
+      .HistoricalStock(symbol, fromDate, toDate, tp, new Date(Date.now()))
+      .then((data) => res.status(200).send(data))
+      .catch((error) => res.status(500).send(error));
   }
 );
 
@@ -130,7 +122,7 @@ app.get('/api/vibe_check', async (req, res) => {
   fmpcloud
     .VibeCheck(symbol.toString(), Number(count))
     .then((data) => {
-      if (!data || data.length <= 0) throw new Error(`no data found!`) 
+      if (!data || data.length <= 0) throw new Error(`no data found!`);
       console.log(`data has been found : count = ${data.length}`);
       res.status(200).send(data);
     })

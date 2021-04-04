@@ -119,35 +119,32 @@ export default class FMPCloud {
     timePeriod = TimePeriod['1hour'],
     earningsDate: Date
   ): Promise<Stock[]> => {
-    try {
-      if (timePeriod in TimePeriod === false) {
-        console.log('[HistoricalStock] : invalid time period');
-        throw new Error('Invalid time period');
-      }
+    const url =
+      this.#baseURL +
+      '/historical-chart/' +
+      timePeriod.toString() +
+      '/' +
+      symbol.toUpperCase() +
+      '?from=' +
+      this.#formatDateString(startDate) +
+      '&to=' +
+      this.#formatDateString(endDate) +
+      '&apikey=' +
+      this.#apiKey;
 
-      console.log(`[Historical Stock] about to get data for ${symbol}`);
-
-      const url =
-        this.#baseURL +
-        '/historical-chart/' +
-        timePeriod.toString() +
-        '/' +
-        symbol.toUpperCase() +
-        '?from=' +
-        this.#formatDateString(startDate) +
-        '&to=' +
-        this.#formatDateString(endDate) +
-        '&apikey=' +
-        this.#apiKey;
-
-      const res = await got(url);
-      const stockdata = JSON.parse(res.body);
-      console.log(`  - [Historical Stock] DONE getting data for ${symbol}`);
-      return stockdata;
-    } catch (err) {
-      console.log(`Error : [HistoricalStock] : ${err}`);
-      throw err;
-    }
+    return got(url)
+      .then((resp) => {
+        if (resp.statusCode !== 200) {
+          throw new Error(`statusCode : ${resp.statusCode}`);
+        }
+        const data = JSON.parse(resp.body);
+        console.log(`got data : count = ${data.length}`);
+        return data;
+      })
+      .catch((error) => {
+        console.log(`[HistoricalStock] Error : ${error}`);
+        return error;
+      });
   };
 
   /**
@@ -157,99 +154,71 @@ export default class FMPCloud {
    * @param {number} count number of historical earnings to vibe check
    */
   VibeCheck = async (symbol: string, count = 4): Promise<any> => {
-    try {
-      const earnings = await this.HistoricalEarnings(symbol, count);
+    const earnings = await this.HistoricalEarnings(symbol, count);
 
-      console.log(`got earnings : count = ${earnings.length}`);
+    console.log(`got earnings : count = ${earnings.length}`);
 
-      const promises: Promise<Stock[]>[] = [];
-      earnings.forEach((e) => {
-        promises.push(
-          this.HistoricalStock(
-            e.symbol,
-            e.daysBefore,
-            e.daysAfter,
-            TimePeriod['1min'],
-            e.date // this is a hack
-          )
-            .then((data) => data)
-            .catch((error) => error)
+    const promises: Promise<Stock[]>[] = [];
+    earnings.forEach((e) => {
+      promises.push(
+        this.HistoricalStock(
+          e.symbol,
+          e.daysBefore,
+          e.daysAfter,
+          TimePeriod['1min'],
+          e.date // this is a hack
+        )
+          .then((data) => data)
+          .catch((error) => error)
+      );
+    });
+
+    const stockDataArrayOfArrays = await Promise.all(promises);
+
+    console.log(`got stock data : count = ${stockDataArrayOfArrays.length}`);
+
+    let finalData: EarningsVibe[] = [];
+
+    stockDataArrayOfArrays.forEach((stockDataArray, idx) => {
+      if (stockDataArray.length <= 0)
+        console.log(`no stock data for array at index ${idx}`);
+      else {
+        stdout.write(
+          `found ${stockDataArray.length} 1min candles, so there should be data here : `
         );
-      });
+        const firstStockData = stockDataArray[0];
+        if (firstStockData && firstStockData.date) {
+          const firstStockDataDate = new Date(firstStockData.date).valueOf();
+          console.log(`${firstStockDataDate}`);
 
-      const stockDataArrayOfArrays = await Promise.all(promises);
-
-      console.log(`got stock data : count = ${stockDataArrayOfArrays.length}`);
-      console.log(JSON.stringify(stockDataArrayOfArrays, null, 2))
-
-      let finalData: EarningsVibe[] = [];
-
-      stockDataArrayOfArrays.forEach((stockDataArray, idx) => {
-        if (stockDataArray.length <= 0)
-          console.log(`no stock data for array at index ${idx}`);
-        else {
-          stdout.write(
-            `found ${stockDataArray.length} 1min candles, so there should be data here : `
-          );
-          const firstStockData = stockDataArray[0];
-          if (firstStockData && firstStockData.date) {
-            const firstStockDataDate = new Date(firstStockData.date).valueOf();
-            console.log(`${firstStockDataDate}`);
-
-            const foundEarnings = earnings.find((e) => {
-              const start = new Date(e.daysBefore).valueOf();
-              const end = new Date(e.daysAfter).valueOf();
-              let isearnings = false;
-              if (firstStockDataDate >= start && firstStockDataDate <= end) {
-                isearnings = true;
-              }
-              return isearnings;
-            });
-
-            if (foundEarnings) {
-              console.log(
-                `found earnings for stock data! : ${firstStockDataDate}`
-              );
-              finalData.push({
-                earnings: foundEarnings,
-                stock: stockDataArray.sort(
-                  (a, b) =>
-                    new Date(a.date).getTime() - new Date(b.date).getTime()
-                )
-              });
+          const foundEarnings = earnings.find((e) => {
+            const start = new Date(e.daysBefore).valueOf();
+            const end = new Date(e.daysAfter).valueOf();
+            let isearnings = false;
+            if (firstStockDataDate >= start && firstStockDataDate <= end) {
+              isearnings = true;
             }
-            console.log('');
+            return isearnings;
+          });
+
+          if (foundEarnings) {
+            console.log(
+              `found earnings for stock data! : ${firstStockDataDate}`
+            );
+            finalData.push({
+              earnings: foundEarnings,
+              stock: stockDataArray.sort(
+                (a, b) =>
+                  new Date(a.date).getTime() - new Date(b.date).getTime()
+              )
+            });
           }
+          console.log('');
         }
-      });
+      }
+    });
 
-      console.log(`finalData count = ${finalData.length}`);
-      return finalData;
-
-      // return earnings.map((earning) => {
-      //   let vibe = { earning, stock: [] as Stock[] };
-      //   stockDataArrayOfArrays.forEach((stockData) => {
-      //     console.log({ stockDataZero: stockData[0] });
-      //     if (!stockData || stockData.length <= 0 || !stockData[0].date)
-      //       throw new Error('stockData[0].date is null');
-      //     const stockDataDate = new Date(stockData[0].date);
-      //     console.log(
-      //       `${stockDataDate.valueOf()} >= ${earning.daysBefore.valueOf()} && ${stockDataDate.valueOf()} <= ${earning.daysAfter.valueOf()}`,
-      //       stockDataDate.valueOf() >= earning.daysBefore.valueOf(),
-      //       stockDataDate.valueOf() <= earning.daysAfter.valueOf()
-      //     );
-      //     if (
-      //       stockDataDate.valueOf() >= earning.daysBefore.valueOf() &&
-      //       stockDataDate.valueOf() <= earning.daysAfter.valueOf()
-      //     ) {
-      //       vibe.stock = stockData;
-      //     }
-      //   });
-      //   return vibe;
-      // });
-    } catch (e) {
-      console.error(`Error : [VibeCheck] : ${e}`);
-      throw e;
-    }
+    console.log(`finalData count = ${finalData.length}`);
+    return finalData;
   };
 }
