@@ -181,38 +181,41 @@ export default class FMPCloud {
 
       let finalData: EarningsVibe[] = [];
 
-      stockDataArrayOfArrays.forEach((stockDataArray) => {
-        stdout.write(`found ${stockDataArray.length} 1min candles, so there should be data here : `);
-        const firstStockData = stockDataArray[0];
-        if (firstStockData && firstStockData.date) {
-          const firstStockDataDate = new Date(firstStockData.date).valueOf();
-          console.log(`${firstStockDataDate}`);
+      stockDataArrayOfArrays.forEach((stockDataArray, idx) => {
+        if (stockDataArray.length <= 0) console.log(`no stock data for array at index ${idx}`);
+        else {
+          stdout.write(`found ${stockDataArray.length} 1min candles, so there should be data here : `);
+          const firstStockData = stockDataArray[0];
+          if (firstStockData && firstStockData.date) {
+            const firstStockDataDate = new Date(firstStockData.date).valueOf();
+            console.log(`${firstStockDataDate}`);
 
-          const foundEarnings = earnings.find((e) => {
-            const start = new Date(e.daysBefore).valueOf();
-            const end = new Date(e.daysAfter).valueOf();
-            let isearnings = false;
-            if (firstStockDataDate >= start && firstStockDataDate <= end) {
-              isearnings = true;
-            }
-            return isearnings;
-          });
-
-          if (foundEarnings) {
-            console.log(`found earnings for stock data! : ${firstStockDataDate}`)
-            finalData.push({
-              earnings: foundEarnings,
-              stock: stockDataArray.sort(
-                (a, b) =>
-                  new Date(a.date).getTime() - new Date(b.date).getTime()
-              )
+            const foundEarnings = earnings.find((e) => {
+              const start = new Date(e.daysBefore).valueOf();
+              const end = new Date(e.daysAfter).valueOf();
+              let isearnings = false;
+              if (firstStockDataDate >= start && firstStockDataDate <= end) {
+                isearnings = true;
+              }
+              return isearnings;
             });
+
+            if (foundEarnings) {
+              console.log(`found earnings for stock data! : ${firstStockDataDate}`)
+              finalData.push({
+                earnings: foundEarnings,
+                stock: stockDataArray.sort(
+                  (a, b) =>
+                    new Date(a.date).getTime() - new Date(b.date).getTime()
+                )
+              });
+            }
+            console.log('');
           }
-          console.log('');
         }
       });
 
-      console.log(`finalData count : ${finalData.length}`);
+      console.log(`finalData count = ${finalData.length}`);
       return finalData;
 
       // return earnings.map((earning) => {
