@@ -106,7 +106,7 @@ function App() {
           <BodyContainer style={{ marginTop: '6rem' }} fluid>
             <Row className="justify-content-center center-me">
               <Col sm={12} md={10} ref={ref}>
-                {data && data.length > 0 && <h1>{data[0].earnings.symbol} {new Date(Date.now()).toString()}</h1>}
+                {data && data.length > 0 && <h1>{data[0].earnings.symbol}</h1>}
                 {data.map((vibe) => {
                   return (
                     <Row>
@@ -125,7 +125,7 @@ function App() {
                               </thead>
                               <tbody>
                                 <tr>
-                                  <td>{vibe.earnings.date} {vibe.earnings.time}</td>
+                                  <td>{vibe.earnings.date} [{vibe.earnings.time === 'amc' ? 'after market close' : '- before market open'}]</td>
                                   <td>
                                     {!vibe.earnings.epsEstimated ||
                                     vibe.earnings.epsEstimated <= 0
