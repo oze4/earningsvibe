@@ -127,13 +127,16 @@ app.get('/api/vibe_check', async (req, res) => {
 });
 
 app.get('/api/server_tz', (_req: Request, res: Response) => {
-  const serverTzOffset = new Date(Date.now()).getTimezoneOffset();
+  const now = new Date(Date.now());
+  const serverTzOffset = new Date(now).getTimezoneOffset();
   const html = `
   <table>
     <tr>
+      <th>Now</th>
       <th>Server TZ Offset</th>
     </tr>
     <tr>
+      <td>${now}</td>
       <td>${serverTzOffset || 'null'}</td>
     </tr>
   </table>
