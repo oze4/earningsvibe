@@ -21,7 +21,7 @@ export function getRelativeDate(
 ) {
   // If the consumer did not supply a `relativeDate` param, use current Date
   if (!relativeDate) {
-    relativeDate = new Date(Date.now());
+    throw new Error('[getRelativeDate] : relativeDate not provided')
   }
   // If numberOfDays param not supplied, defalt to 1
   if (!numberOfDays) {
@@ -29,11 +29,15 @@ export function getRelativeDate(
   }
 
   const d = new Date(relativeDate);
+  const dd = new Date(relativeDate)
   if (beforeOrAfter === BeforeOrAfter.after) {
-    return new Date(d.setDate(d.getDate() + numberOfDays));
-  }
-  if (beforeOrAfter === BeforeOrAfter.before) {
-    return new Date(d.setDate(d.getDate() - numberOfDays));
+    const a = new Date(d.setDate(d.getDate() + numberOfDays));
+    console.log(`[getRelativeDate] : original date (${new Date(dd)}) + ${numberOfDays} = afterDate : ${a}`)
+    return a;
+  } else if (beforeOrAfter === BeforeOrAfter.before) {
+    const b = new Date(d.setDate(d.getDate() - numberOfDays));
+    console.log(`[getRelativeDate] : original date (${new Date(dd)}) + ${numberOfDays} = beforeDate : ${b}`);
+    return b;
   }
   throw new Error('beforeOrAfter not equal to "before" or "after"');
 }

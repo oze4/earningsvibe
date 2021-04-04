@@ -95,10 +95,15 @@ export default class FMPCloud {
         .filter((e) => e.eps !== null)
         .map((e) => {
           const d = new Date(e.date);
+          console.log({ earningsDate: e.date, earningsDateFormatted: d })
+          const da = new Date(getRelativeDate(BeforeOrAfter.after, 2, d));
+          console.log(`[HistoricalEarnings] daysAfter : ${da}`);
+          const db = new Date(getRelativeDate(BeforeOrAfter.before, 2, d));
+          console.log(`[HistoricalEarnings] daysBefore : ${db}`);
           return {
             ...e,
-            daysAfter: new Date(getRelativeDate(BeforeOrAfter.after, 1, d)),
-            daysBefore: new Date(getRelativeDate(BeforeOrAfter.before, 1, d))
+            daysAfter: da,
+            daysBefore: db
           };
         })
         .slice(0, numberOfPriorEarnings);
@@ -138,7 +143,7 @@ export default class FMPCloud {
         '&apikey=' +
         this.#apiKey;
 
-      console.log(`HistoricalStock : url ${url}`);
+      console.log(`HistoricalStock : url ${url} : startBefore : ${startDate} : startAfterFormat : ${from} : endBefore : ${endDate} : endAfterFormat : ${to}`);
 
       const resp = await got(url);
       const data = JSON.parse(resp.body);
