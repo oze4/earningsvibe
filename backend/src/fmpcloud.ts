@@ -97,8 +97,8 @@ export default class FMPCloud {
           const d = new Date(e.date);
           return {
             ...e,
-            daysAfter: new Date(getRelativeDate(BeforeOrAfter.after, 2, d)),
-            daysBefore: new Date(getRelativeDate(BeforeOrAfter.before, 2, d))
+            daysAfter: new Date(getRelativeDate(BeforeOrAfter.after, 4, d)),
+            daysBefore: new Date(getRelativeDate(BeforeOrAfter.before, 4, d))
           };
         })
         .slice(0, numberOfPriorEarnings);
