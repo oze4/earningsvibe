@@ -121,8 +121,11 @@ export default class FMPCloud {
   ): Promise<Stock[]> => {
     try {
       if (timePeriod in TimePeriod === false) {
+        console.log('[HistoricalStock] : invalid time period');
         throw new Error('Invalid time period');
       }
+
+      console.log(`[Historical Stock] about to get data for ${symbol}`);
 
       const url =
         this.#baseURL +
@@ -139,7 +142,8 @@ export default class FMPCloud {
 
       const res = await got(url);
       const stockdata = JSON.parse(res.body);
-      return stockdata.sort();
+      console.log(`  - [Historical Stock] DONE getting data for ${symbol}`);
+      return stockdata;
     } catch (err) {
       console.log(`Error : [HistoricalStock] : ${err}`);
       throw err;
