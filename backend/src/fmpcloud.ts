@@ -176,7 +176,7 @@ export default class FMPCloud {
         const foundEarnings = earnings.find((e) => {
           const start = new Date(e.daysBefore).valueOf();
           const end = new Date(e.daysAfter).valueOf();
-          console.log({ start, end, stockDate, isEarnings: stockDate >= start && stockDate <= end })
+          console.log({ start, end, stockDate, isEarnings: `${stockDate} >= ${start} && ${stockDate} <= ${end} === ${stockDate >= start && stockDate <= end}` })
           return stockDate >= start && stockDate <= end;
         });
 
