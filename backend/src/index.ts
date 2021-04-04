@@ -52,10 +52,14 @@ app.get(
     const tp = (time_period as unknown) as TimePeriod;
     const fromDate = new Date(from.toString());
     const toDate = new Date(to.toString());
-    
+
+    const sortDatesOldToNew = (d: Stock[]) => {
+      return d.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+    }
+
     fmpcloud
       .HistoricalStock(symbol, fromDate, toDate, tp, new Date(Date.now()))
-      .then((data) => res.status(200).send(data))
+      .then((data) => res.status(200).send(sortDatesOldToNew(data)))
       .catch((error) => res.status(500).send(error));
   }
 );
