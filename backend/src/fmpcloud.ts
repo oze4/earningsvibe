@@ -97,8 +97,8 @@ export default class FMPCloud {
           const d = new Date(e.date);
           return {
             ...e,
-            daysAfter: new Date(getRelativeDate(BeforeOrAfter.after, 4, d)),
-            daysBefore: new Date(getRelativeDate(BeforeOrAfter.before, 4, d))
+            daysAfter: new Date(getRelativeDate(BeforeOrAfter.after, 1, d)),
+            daysBefore: new Date(getRelativeDate(BeforeOrAfter.before, 1, d))
           };
         })
         .slice(0, numberOfPriorEarnings);
@@ -185,6 +185,10 @@ export default class FMPCloud {
           console.log({
             dateLocaleStringWithCurrentTimezone: d.toLocaleString('en-US', { timeZone }),
             timeZone,
+            earningsDate: e.date,
+            daysBefore: e.daysBefore,
+            stockDate: stock.date,
+            daysAfter: e.daysAfter,
             startBefore: new Date(e.daysBefore),
             startBeforeWithCurrentTimezone: new Date(start).toLocaleString('en-US', { timeZone }),
             start_hoursZerodOut: new Date(_start).toLocaleString(),
