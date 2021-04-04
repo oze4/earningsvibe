@@ -96,7 +96,6 @@ app.get('/api/earnings_data/:symbol', async (req: Request, res: Response) => {
       symbol.toUpperCase(),
       Number(count)
     );
-    console.log(new Date(Date.now()))
     res.status(200).send(data);
   } catch (e) {
     console.log(e);
@@ -115,6 +114,7 @@ app.get('/api/earnings_data/:symbol', async (req: Request, res: Response) => {
  */
 app.get('/api/vibe_check', async (req, res) => {
   try {
+    console.log(`Server TZ offset : ${new Date(Date.now()).getTimezoneOffset()}`)
     const { symbol = '', count = 4 } = req.query;
     const data = await fmpcloud.VibeCheck(symbol.toString(), Number(count));
     res.status(200).send(data);
@@ -122,6 +122,10 @@ app.get('/api/vibe_check', async (req, res) => {
     console.log(`/api/vibe_check : Error : ${error}`);
     res.status(500).send(error);
   }
+});
+
+app.get('/api/server_tz', (_req: Request, res: Response) => {
+  res.status(200).send({ server_tz_offset: new Date(Date.now()).getTimezoneOffset() });
 });
 
 app.get('*', (_req: Request, res: Response) => {
