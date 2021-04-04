@@ -122,6 +122,9 @@ export default class FMPCloud {
     timePeriod = TimePeriod['1hour']
   ): Promise<Stock[]> => {
     try {
+      const from = this.#formatDateString(startDate);
+      const to = this.#formatDateString(endDate);
+      console.log(`getting historial stock data from ${from} to ${to}`);
       const url =
         this.#baseURL +
         '/historical-chart/' +
@@ -129,14 +132,17 @@ export default class FMPCloud {
         '/' +
         symbol.toUpperCase() +
         '?from=' +
-        this.#formatDateString(startDate) +
+        from +
         '&to=' +
-        this.#formatDateString(endDate) +
+        to +
         '&apikey=' +
         this.#apiKey;
 
+      console.log(`HistoricalStock : url ${url}`);
+
       const resp = await got(url);
-      return JSON.parse(resp.body);
+      const data = JSON.parse(resp.body);
+      return data.map((d: Stock) => ({ ...d, formattedDate: this.#formatDateString(d.date) }));
     } catch (error) {
       const e = new Error(`fmpcloud.HistoricalStock : Error : ${error}`);
       console.log(e);
@@ -182,25 +188,42 @@ export default class FMPCloud {
           const _stockDate = new Date(new Date(stockDate).setHours(0, 0, 0, 0));
           const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
           var d = new Date();
+          const foundDates = stockData.reduce(
+            (accumulator, current) => {
+              if(!accumulator.some(x => x.date.valueOf() === current.date.valueOf())) {
+                accumulator.push(current)
+              }
+              return accumulator;
+            }, ([] as Stock[])
+          )
+          const isEarnings =
+            _stockDate.valueOf() >= _start.valueOf() &&
+            _stockDate.valueOf() <= _end.valueOf();
           console.log({
-            dateLocaleStringWithCurrentTimezone: d.toLocaleString('en-US', { timeZone }),
+            dateLocaleStringWithCurrentTimezone: d.toLocaleString('en-US', {
+              timeZone
+            }),
             timeZone,
             earningsDate: e.date,
             daysBefore: e.daysBefore,
             stockDate: stock.date,
             daysAfter: e.daysAfter,
             startBefore: new Date(e.daysBefore),
-            startBeforeWithCurrentTimezone: new Date(start).toLocaleString('en-US', { timeZone }),
+            startBeforeWithCurrentTimezone: new Date(
+              start
+            ).toLocaleString('en-US', { timeZone }),
             start_hoursZerodOut: new Date(_start).toLocaleString(),
             endBefore: new Date(e.daysAfter),
-            endBeforeWithCurrentTimezone: new Date(end).toLocaleString('en-US', { timeZone }),
+            endBeforeWithCurrentTimezone: new Date(end).toLocaleString(
+              'en-US',
+              { timeZone }
+            ),
             end_hoursZerodOut: new Date(_end).toLocaleString(),
             stockDateBefore: new Date(stockDate).toLocaleString(),
             stockDate_hoursZerodOut: new Date(_stockDate).toLocaleString(),
             isEarningsFormula: `'${_stockDate}' less than or equal to '${_start}' and greater than or equal to '${_end}'`,
-            isEarnings:
-              _stockDate.valueOf() >= _start.valueOf() &&
-              _stockDate.valueOf() <= _end.valueOf()
+            isEarnings,
+            foundDates: isEarnings ? foundDates.length : '',
           });
           // console.log({ start: new Date(new Date(start).setHours(0, 0, 0, 0)), end: new Date(new Date(end).setHours(0, 0, 0, 0)), stockDate: new Date(new Date(stockDate).setHours(0, 0, 0, 0)), isEarnings: `${new Date(stockDate).setHours(0, 0, 0, 0)} >= ${new Date(start).setHours(0, 0, 0, 0)} && ${new Date(stockDate).setHours(0, 0, 0, 0)} <= ${new Date(end).setHours(0, 0, 0, 0)} === ${new Date(stockDate).setHours(0, 0, 0, 0) >= new Date(start).setHours(0, 0, 0, 0) && new Date(stockDate).setHours(0, 0, 0, 0) <= new Date(end).setHours(0, 0, 0, 0)}` })
           //return new Date(stockDate).setHours(0, 0, 0, 0) >= new Date(start).setHours(0, 0, 0, 0) && new Date(stockDate).setHours(0, 0, 0, 0) <= new Date(end).setHours(0, 0, 0, 0);

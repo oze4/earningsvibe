@@ -114,9 +114,6 @@ app.get('/api/earnings_data/:symbol', async (req: Request, res: Response) => {
  */
 app.get('/api/vibe_check', async (req, res) => {
   try {
-    console.log(
-      `Server TZ offset : ${new Date(Date.now()).getTimezoneOffset()}`
-    );
     const { symbol = '', count = 4 } = req.query;
     const data = await fmpcloud.VibeCheck(symbol.toString(), Number(count));
     res.status(200).send(data);
