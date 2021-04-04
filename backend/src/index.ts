@@ -130,7 +130,7 @@ app.get('/api/vibe_check', async (req, res) => {
   fmpcloud
     .VibeCheck(symbol.toString(), Number(count))
     .then((data) => {
-      if (!data || data.length <= 0) res.status(500).send(`no data found!`) 
+      if (!data || data.length <= 0) throw new Error(`no data found!`) 
       console.log(`data has been found : count = ${data.length}`);
       res.status(200).send(data);
     })
