@@ -185,10 +185,10 @@ export default class FMPCloud {
           console.log({
             dateLocaleStringWithCurrentTimezone: d.toLocaleString('en-US', { timeZone }),
             timeZone,
-            startBefore: new Date(start).toLocaleString(),
+            startBefore: new Date(e.daysBefore),
             startBeforeWithCurrentTimezone: new Date(start).toLocaleString('en-US', { timeZone }),
             start_hoursZerodOut: new Date(_start).toLocaleString(),
-            endBefore: new Date(end).toLocaleString(),
+            endBefore: new Date(e.daysAfter),
             endBeforeWithCurrentTimezone: new Date(end).toLocaleString('en-US', { timeZone }),
             end_hoursZerodOut: new Date(_end).toLocaleString(),
             stockDateBefore: new Date(stockDate).toLocaleString(),
