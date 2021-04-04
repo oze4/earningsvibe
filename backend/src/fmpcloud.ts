@@ -8,6 +8,7 @@ import {
 } from './types';
 import { getRelativeDate } from './utils';
 import e from 'express';
+import { stdout } from 'process';
 
 /**
  * FMPCloud allows you to interact with the fmpcloud.io API
@@ -177,11 +178,11 @@ export default class FMPCloud {
       let finalData: EarningsVibe[] = [];
 
       stockDataArrayOfArrays.forEach((stockDataArray) => {
-        console.log(`found ${stockDataArray.length} 1min candles`);
+        stdout.write(`found ${stockDataArray.length} 1min candles, so there should be data here : `);
         const firstStockData = stockDataArray[0];
         if (firstStockData && firstStockData.date) {
           const firstStockDataDate = new Date(firstStockData.date).valueOf();
-          console.log(`\nfound first stock data : ${new Date(firstStockDataDate)}`);
+          console.log(`${firstStockDataDate}`);
 
           const foundEarnings = earnings.find((e) => {
             const start = new Date(e.daysBefore).valueOf();
@@ -203,9 +204,11 @@ export default class FMPCloud {
               )
             });
           }
+          console.log('');
         }
       });
 
+      console.log(`finalData count : ${finalData.length}`);
       return finalData;
 
       // return earnings.map((earning) => {
