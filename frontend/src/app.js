@@ -125,7 +125,7 @@ function App() {
                               </thead>
                               <tbody>
                                 <tr>
-                                  <td>{vibe.earnings.date}</td>
+                                  <td>{vibe.earnings.date} {vibe.earnings.time}</td>
                                   <td>
                                     {!vibe.earnings.epsEstimated ||
                                     vibe.earnings.epsEstimated <= 0
