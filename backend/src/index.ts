@@ -114,7 +114,9 @@ app.get('/api/earnings_data/:symbol', async (req: Request, res: Response) => {
  */
 app.get('/api/vibe_check', async (req, res) => {
   try {
-    console.log(`Server TZ offset : ${new Date(Date.now()).getTimezoneOffset()}`)
+    console.log(
+      `Server TZ offset : ${new Date(Date.now()).getTimezoneOffset()}`
+    );
     const { symbol = '', count = 4 } = req.query;
     const data = await fmpcloud.VibeCheck(symbol.toString(), Number(count));
     res.status(200).send(data);
@@ -125,7 +127,19 @@ app.get('/api/vibe_check', async (req, res) => {
 });
 
 app.get('/api/server_tz', (_req: Request, res: Response) => {
-  res.status(200).send({ server_tz_offset: new Date(Date.now()).getTimezoneOffset() });
+  const serverTzOffset = new Date(Date.now()).getTimezoneOffset();
+  const html = `
+  <table>
+    <tr>
+      <th>Server TZ Offset</th>
+    </tr>
+    <tr>
+      <td>${serverTzOffset || 'null'}</td>
+    </tr>
+  </table>
+  `;
+  console.log(html); 
+  res.status(200).send(html);
 });
 
 app.get('*', (_req: Request, res: Response) => {
@@ -133,5 +147,5 @@ app.get('*', (_req: Request, res: Response) => {
 });
 
 const server = app.listen(APP_PORT, APP_IP, () => {
-  console.log(`app listening at :`, { server: server.address() })
+  console.log(`app listening at :`, { server: server.address() });
 });
