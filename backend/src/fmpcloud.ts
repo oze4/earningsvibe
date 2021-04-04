@@ -153,8 +153,6 @@ export default class FMPCloud {
   VibeCheck = async (symbol: string, count = 4): Promise<any> => {
     const earnings = await this.HistoricalEarnings(symbol, count);
 
-    console.log(`got earnings : count = ${earnings.length}`);
-
     const promises: Promise<Stock[]>[] = [];
     earnings.forEach((e) => {
       promises.push(
@@ -164,57 +162,39 @@ export default class FMPCloud {
           e.daysAfter,
           TimePeriod['1min']
         )
-          .then((data) => data)
-          .catch((error) => error)
       );
     });
 
-    const stockDataArrayOfArrays = await Promise.all(promises);
-
-    console.log(`got stock data : count = ${stockDataArrayOfArrays.length}`);
+    const stockDatas = await Promise.all(promises);
 
     let finalData: EarningsVibe[] = [];
+    stockDatas.forEach((stockData) => {
+      const stock = stockData[0];
+      if (stock && stock.date) {
+        console.log(`valid stock data found`)
+        const stockDate = new Date(stock.date).valueOf();
+        const foundEarnings = earnings.find((e) => {
+          const start = new Date(e.daysBefore).valueOf();
+          const end = new Date(e.daysAfter).valueOf();
+          console.log({ start, end, stockDate, isEarnings: stockDate >= start && stockDate <= end })
+          return stockDate >= start && stockDate <= end;
+        });
 
-    stockDataArrayOfArrays.forEach((stockDataArray, idx) => {
-      if (stockDataArray.length <= 0)
-        console.log(`no stock data for array at index ${idx}`);
-      else {
-        stdout.write(
-          `found ${stockDataArray.length} 1min candles, so there should be data here : `
-        );
-        const firstStockData = stockDataArray[0];
-        if (firstStockData && firstStockData.date) {
-          const firstStockDataDate = new Date(firstStockData.date).valueOf();
-          console.log(`${firstStockDataDate}`);
-
-          const foundEarnings = earnings.find((e) => {
-            const start = new Date(e.daysBefore).valueOf();
-            const end = new Date(e.daysAfter).valueOf();
-            let isearnings = false;
-            if (firstStockDataDate >= start && firstStockDataDate <= end) {
-              isearnings = true;
-            }
-            return isearnings;
+        if (foundEarnings) {
+          console.log(`found earnings that matches stock date! Pushing into finalData\n`);
+          finalData.push({
+            earnings: foundEarnings,
+            stock: stockData.sort(
+              (a, b) =>
+                new Date(a.date).getTime() - new Date(b.date).getTime()
+            )
           });
-
-          if (foundEarnings) {
-            console.log(
-              `found earnings for stock data! : ${firstStockDataDate}`
-            );
-            finalData.push({
-              earnings: foundEarnings,
-              stock: stockDataArray.sort(
-                (a, b) =>
-                  new Date(a.date).getTime() - new Date(b.date).getTime()
-              )
-            });
-          }
-          console.log('');
         }
+      } else {
+        console.log(`invalid or missing stock data`);
       }
     });
-
-    console.log(`finalData count = ${finalData.length}`);
+    console.log(`finalData.length = ${finalData.length}`);
     return finalData;
   };
 }
