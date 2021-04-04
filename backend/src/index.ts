@@ -16,7 +16,7 @@ if (!process.env.FMPCLOUD_API_KEY) {
 
 const fmpcloud = new FMPCloud(process.env.FMPCLOUD_API_KEY);
 const app = express();
-const appPort = Number(process.env.PORT || 8081);
+const appPort = Number(process.env.PORT || 8082);
 const appIp = '0.0.0.0';
 // const feBuildPath = path.resolve(__dirname, '../../build/frontend');
 // const feStaticAssets = path.join(feBuildPath, '/static');
@@ -125,16 +125,18 @@ app.get('/api/earnings_data/:symbol', async (req: Request, res: Response) => {
  *  - If no count query param is proided, we default to 4 prior earnings (typically ~1 years worth)
  */
 app.get('/api/vibe_check', async (req, res) => {
-  try {
-    const { symbol = '', count = 4 } = req.query;
-    const data = await fmpcloud.VibeCheck(symbol.toString(), Number(count));
-    if (data.length <= 0) throw new Error('there should be data here');
-    else console.log(`there is data here : count ${data.length}`);
-    res.status(200).send(data);
-  } catch (e) {
-    console.log(e);
-    res.status(500).send({ status: 500, message: `${e}` });
-  }
+  const { symbol = '', count = 4 } = req.query;
+  // const data = await fmpcloud.VibeCheck(symbol.toString(), Number(count));
+  fmpcloud
+    .VibeCheck(symbol.toString(), Number(count))
+    .then((data) => {
+      console.log(`data has been found : count = ${data.length}`);
+      res.status(200).send(data);
+    })
+    .catch((error) => {
+      console.log(`no data found : ${error}`);
+      res.status(500).send(`${error}`);
+    });
 });
 
 app.get('*', (_req: Request, res: Response) => {
