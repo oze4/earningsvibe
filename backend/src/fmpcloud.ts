@@ -180,6 +180,7 @@ export default class FMPCloud {
       const stockDataArrayOfArrays = await Promise.all(promises);
 
       console.log(`got stock data : count = ${stockDataArrayOfArrays.length}`);
+      console.log(JSON.stringify(stockDataArrayOfArrays, null, 2))
 
       let finalData: EarningsVibe[] = [];
 
