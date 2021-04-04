@@ -96,6 +96,7 @@ app.get('/api/earnings_data/:symbol', async (req: Request, res: Response) => {
       symbol.toUpperCase(),
       Number(count)
     );
+    console.log(new Date(Date.now()))
     res.status(200).send(data);
   } catch (e) {
     console.log(e);
