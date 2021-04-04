@@ -176,13 +176,23 @@ export default class FMPCloud {
         const foundEarnings = earnings.find((e) => {
           const start = new Date(e.daysBefore).valueOf();
           const end = new Date(e.daysAfter).valueOf();
+
+          const _start = new Date(new Date(start).setHours(0, 0, 0, 0));
+          const _end = new Date(new Date(end).setHours(0, 0, 0, 0));
+          const _stockDate = new Date(new Date(stockDate).setHours(0, 0, 0, 0));
           console.log({
-            start: new Date(start),
-            end: new Date(end),
-            stockDate: new Date(stockDate),
+            startBefore: new Date(start),
+            start: _start,
+            endBefore: new Date(end),
+            end: _end,
+            stockDateBefore: new Date(stockDate),
+            stockDate: _stockDate,
+            isEarningsFormula: `${_stockDate} >= ${_start} && ${_stockDate} <= ${_end}`,
+            isEarnings: _stockDate.valueOf() >= _start.valueOf() && _stockDate.valueOf() <= _end.valueOf(),
           });
           // console.log({ start: new Date(new Date(start).setHours(0, 0, 0, 0)), end: new Date(new Date(end).setHours(0, 0, 0, 0)), stockDate: new Date(new Date(stockDate).setHours(0, 0, 0, 0)), isEarnings: `${new Date(stockDate).setHours(0, 0, 0, 0)} >= ${new Date(start).setHours(0, 0, 0, 0)} && ${new Date(stockDate).setHours(0, 0, 0, 0)} <= ${new Date(end).setHours(0, 0, 0, 0)} === ${new Date(stockDate).setHours(0, 0, 0, 0) >= new Date(start).setHours(0, 0, 0, 0) && new Date(stockDate).setHours(0, 0, 0, 0) <= new Date(end).setHours(0, 0, 0, 0)}` })
-          return new Date(stockDate).setHours(0, 0, 0, 0) >= new Date(start).setHours(0, 0, 0, 0) && new Date(stockDate).setHours(0, 0, 0, 0) <= new Date(end).setHours(0, 0, 0, 0);
+          //return new Date(stockDate).setHours(0, 0, 0, 0) >= new Date(start).setHours(0, 0, 0, 0) && new Date(stockDate).setHours(0, 0, 0, 0) <= new Date(end).setHours(0, 0, 0, 0);
+          return _stockDate.valueOf() >= _start.valueOf() && _stockDate.valueOf() <= _end.valueOf();
         });
 
         if (foundEarnings) {
