@@ -176,8 +176,8 @@ export default class FMPCloud {
         const foundEarnings = earnings.find((e) => {
           const start = new Date(e.daysBefore).valueOf();
           const end = new Date(e.daysAfter).valueOf();
-          console.log({ start: new Date(start), end: new Date(end), stockDate: new Date(stockDate), isEarnings: `${new Date(stockDate).valueOf()} >= ${new Date(start).valueOf()} && ${new Date(stockDate).valueOf()} <= ${new Date(end).valueOf()} === ${new Date(stockDate).valueOf() >= new Date(start).valueOf() && new Date(stockDate).valueOf() <= new Date(end).valueOf()}` })
-          return stockDate >= start && stockDate <= end;
+          console.log({ start: new Date(new Date(start).setHours(0, 0, 0, 0)), end: new Date(new Date(end).setHours(0, 0, 0, 0)), stockDate: new Date(new Date(stockDate).setHours(0, 0, 0, 0)), isEarnings: `${new Date(stockDate).setHours(0, 0, 0, 0)} >= ${new Date(start).setHours(0, 0, 0, 0)} && ${new Date(stockDate).setHours(0, 0, 0, 0)} <= ${new Date(end).setHours(0, 0, 0, 0)} === ${new Date(stockDate).setHours(0, 0, 0, 0) >= new Date(start).setHours(0, 0, 0, 0) && new Date(stockDate).setHours(0, 0, 0, 0) <= new Date(end).setHours(0, 0, 0, 0)}` })
+          return new Date(stockDate).setHours(0, 0, 0, 0) >= new Date(start).setHours(0, 0, 0, 0) && new Date(stockDate).setHours(0, 0, 0, 0) <= new Date(end).setHours(0, 0, 0, 0);
         });
 
         if (foundEarnings) {
