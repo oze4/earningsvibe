@@ -171,12 +171,12 @@ export default class FMPCloud {
     stockDatas.forEach((stockData) => {
       const stock = stockData[0];
       if (stock && stock.date) {
-        console.log(`valid stock data found`)
+        console.log(`valid stock data found : `, new Date(stock.date))
         const stockDate = new Date(stock.date).valueOf();
         const foundEarnings = earnings.find((e) => {
           const start = new Date(e.daysBefore).valueOf();
           const end = new Date(e.daysAfter).valueOf();
-          console.log({ start, end, stockDate, isEarnings: `${new Date(stockDate).valueOf()} >= ${new Date(start).valueOf()} && ${new Date(stockDate).valueOf()} <= ${new Date(end).valueOf()} === ${new Date(stockDate).valueOf() >= new Date(start).valueOf() && new Date(stockDate).valueOf() <= new Date(end).valueOf()}` })
+          console.log({ start: new Date(start), end: new Date(end), stockDate: new Date(stockDate), isEarnings: `${new Date(stockDate).valueOf()} >= ${new Date(start).valueOf()} && ${new Date(stockDate).valueOf()} <= ${new Date(end).valueOf()} === ${new Date(stockDate).valueOf() >= new Date(start).valueOf() && new Date(stockDate).valueOf() <= new Date(end).valueOf()}` })
           return stockDate >= start && stockDate <= end;
         });
 
