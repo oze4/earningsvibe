@@ -84,21 +84,24 @@ export default class FMPCloud {
         // the "next" earnings date(s), even though there will be no data.... Sometimes they
         // return one null date, sometimes two, etc... We add a buffer, then slice at the end
         // as to return the requested amount of earnings.
-        String(numberOfPriorEarnings) +
+        String(numberOfPriorEarnings + 8) +
         '&apikey=' +
         this.#apiKey;
 
       const r = await got(url);
       const earnings: Earnings[] = JSON.parse(r.body);
 
-      return earnings.map((e) => {
-        const d = new Date(e.date);
-        return {
-          ...e,
-          daysAfter: new Date(getRelativeDate(BeforeOrAfter.after, 1, d)),
-          daysBefore: new Date(getRelativeDate(BeforeOrAfter.before, 1, d))
-        };
-      });
+      return earnings
+        .filter((e) => e.eps !== null)
+        .map((e) => {
+          const d = new Date(e.date);
+          return {
+            ...e,
+            daysAfter: new Date(getRelativeDate(BeforeOrAfter.after, 1, d)),
+            daysBefore: new Date(getRelativeDate(BeforeOrAfter.before, 1, d))
+          };
+        })
+        .slice(0, numberOfPriorEarnings);
     } catch (e) {
       console.log('Error : HistoricalEarnings : ', e);
       throw e;
@@ -116,35 +119,29 @@ export default class FMPCloud {
     symbol: string,
     startDate: Date,
     endDate: Date,
-    timePeriod = TimePeriod['1hour'],
-    earningsDate: Date
+    timePeriod = TimePeriod['1hour']
   ): Promise<Stock[]> => {
-    const url =
-      this.#baseURL +
-      '/historical-chart/' +
-      timePeriod.toString() +
-      '/' +
-      symbol.toUpperCase() +
-      '?from=' +
-      this.#formatDateString(startDate) +
-      '&to=' +
-      this.#formatDateString(endDate) +
-      '&apikey=' +
-      this.#apiKey;
+    try {
+      const url =
+        this.#baseURL +
+        '/historical-chart/' +
+        timePeriod.toString() +
+        '/' +
+        symbol.toUpperCase() +
+        '?from=' +
+        this.#formatDateString(startDate) +
+        '&to=' +
+        this.#formatDateString(endDate) +
+        '&apikey=' +
+        this.#apiKey;
 
-    return got(url)
-      .then((resp) => {
-        if (resp.statusCode !== 200) {
-          throw new Error(`statusCode : ${resp.statusCode}`);
-        }
-        const data = JSON.parse(resp.body);
-        console.log(`got data : count = ${data.length}`);
-        return data;
-      })
-      .catch((error) => {
-        console.log(`[HistoricalStock] Error : ${error}`);
-        return error;
-      });
+      const resp = await got(url);
+      return JSON.parse(resp.body);
+    } catch (error) {
+      const e = new Error(`fmpcloud.HistoricalStock : Error : ${error}`);
+      console.log(e);
+      throw e;
+    }
   };
 
   /**
@@ -165,8 +162,7 @@ export default class FMPCloud {
           e.symbol,
           e.daysBefore,
           e.daysAfter,
-          TimePeriod['1min'],
-          e.date // this is a hack
+          TimePeriod['1min']
         )
           .then((data) => data)
           .catch((error) => error)

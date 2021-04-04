@@ -9,6 +9,7 @@ import FMPCloud from './fmpcloud';
 import { NewHTTPError } from './errors';
 
 import { Stock } from './types';
+import { send } from 'process';
 
 if (!process.env.FMPCLOUD_API_KEY) {
   throw new Error('Missing FMPCLOUD_API_KEY env var!');
@@ -16,10 +17,8 @@ if (!process.env.FMPCLOUD_API_KEY) {
 
 const fmpcloud = new FMPCloud(process.env.FMPCLOUD_API_KEY);
 const app = express();
-const appPort = Number(process.env.PORT || 8082);
-const appIp = '0.0.0.0';
-// const feBuildPath = path.resolve(__dirname, '../../build/frontend');
-// const feStaticAssets = path.join(feBuildPath, '/static');
+const APP_PORT = Number(process.env.PORT || 8082);
+const APP_IP = '0.0.0.0';
 
 app.use(express.json());
 app.use(
@@ -28,16 +27,8 @@ app.use(
   })
 );
 
-// app.use(express.urlencoded({ extended: false }));
+app.use(express.urlencoded({ extended: false }));
 app.use(helmet());
-
-// Path for frontend static assets
-// app.use('/static', express.static(feStaticAssets));
-
-// app.get('/', (_req: Request, res: Response) => {
-//   const html = path.resolve(__dirname, `${feBuildPath}/index.html`);
-//   res.sendFile(html);
-// });
 
 /**
  * Route Example:
@@ -54,11 +45,13 @@ app.get(
     const toDate = new Date(to.toString());
 
     const sortDatesOldToNew = (d: Stock[]) => {
-      return d.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
-    }
+      return d.sort(
+        (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
+      );
+    };
 
     fmpcloud
-      .HistoricalStock(symbol, fromDate, toDate, tp, new Date(Date.now()))
+      .HistoricalStock(symbol, fromDate, toDate, tp)
       .then((data) => res.status(200).send(sortDatesOldToNew(data)))
       .catch((error) => res.status(500).send(error));
   }
@@ -74,8 +67,7 @@ app.get('/api/test', async (req: Request, res: Response) => {
           ticker,
           new Date('3/20/2019'),
           new Date('3/25/2019'),
-          TimePeriod['1min'],
-          new Date(Date.now())
+          TimePeriod['1min']
         )
       );
     });
@@ -121,25 +113,20 @@ app.get('/api/earnings_data/:symbol', async (req: Request, res: Response) => {
  *  - If no count query param is proided, we default to 4 prior earnings (typically ~1 years worth)
  */
 app.get('/api/vibe_check', async (req, res) => {
-  const { symbol = '', count = 4 } = req.query;
-  // const data = await fmpcloud.VibeCheck(symbol.toString(), Number(count));
-  fmpcloud
-    .VibeCheck(symbol.toString(), Number(count))
-    .then((data) => {
-      if (!data || data.length <= 0) throw new Error(`no data found!`);
-      console.log(`data has been found : count = ${data.length}`);
-      res.status(200).send(data);
-    })
-    .catch((error) => {
-      console.log(`no data found : ${error}`);
-      res.status(500).send(`${error}`);
-    });
+  try {
+    const { symbol = '', count = 4 } = req.query;
+    const data = await fmpcloud.VibeCheck(symbol.toString(), Number(count));
+    res.status(200).send(data);
+  } catch (error) {
+    console.log(`/api/vibe_check : Error : ${error}`);
+    res.status(500).send(error);
+  }
 });
 
 app.get('*', (_req: Request, res: Response) => {
   res.status(404).send({ response: null, status: 404 });
 });
 
-app.listen(appPort, appIp, () => {
-  console.log(`App listening at : http://localhost:${appPort}`);
+const server = app.listen(APP_PORT, APP_IP, () => {
+  console.log(`app listening at :`, { server: server.address() })
 });
