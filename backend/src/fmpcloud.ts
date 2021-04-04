@@ -172,6 +172,8 @@ export default class FMPCloud {
             TimePeriod['1min'],
             e.date // this is a hack
           )
+            .then((data) => data)
+            .catch((error) => error)
         );
       });
 
@@ -182,9 +184,12 @@ export default class FMPCloud {
       let finalData: EarningsVibe[] = [];
 
       stockDataArrayOfArrays.forEach((stockDataArray, idx) => {
-        if (stockDataArray.length <= 0) console.log(`no stock data for array at index ${idx}`);
+        if (stockDataArray.length <= 0)
+          console.log(`no stock data for array at index ${idx}`);
         else {
-          stdout.write(`found ${stockDataArray.length} 1min candles, so there should be data here : `);
+          stdout.write(
+            `found ${stockDataArray.length} 1min candles, so there should be data here : `
+          );
           const firstStockData = stockDataArray[0];
           if (firstStockData && firstStockData.date) {
             const firstStockDataDate = new Date(firstStockData.date).valueOf();
@@ -201,7 +206,9 @@ export default class FMPCloud {
             });
 
             if (foundEarnings) {
-              console.log(`found earnings for stock data! : ${firstStockDataDate}`)
+              console.log(
+                `found earnings for stock data! : ${firstStockDataDate}`
+              );
               finalData.push({
                 earnings: foundEarnings,
                 stock: stockDataArray.sort(
