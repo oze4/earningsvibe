@@ -51,6 +51,7 @@ function App() {
     const url = `${BASE_API_URL}/api/vibe_check?symbol=${event.target.value}&count=10`;
     const resp = await fetch(url);
     const json = await resp.json();
+    console.log({ vibeData: json })
     setData(json);
   };
 
@@ -105,7 +106,7 @@ function App() {
           <BodyContainer style={{ marginTop: '6rem' }} fluid>
             <Row className="justify-content-center center-me">
               <Col sm={12} md={10} ref={ref}>
-                {data && data.length > 0 && <h1>{data[0].earning.symbol}</h1>}
+                {data && data.length > 0 && <h1>{data[0].earnings.symbol}</h1>}
                 {data.map((vibe) => {
                   return (
                     <Row>
@@ -124,45 +125,45 @@ function App() {
                               </thead>
                               <tbody>
                                 <tr>
-                                  <td>{vibe.earning.date}</td>
+                                  <td>{vibe.earnings.date}</td>
                                   <td>
-                                    {!vibe.earning.epsEstimated ||
-                                    vibe.earning.epsEstimated <= 0
+                                    {!vibe.earnings.epsEstimated ||
+                                    vibe.earnings.epsEstimated <= 0
                                       ? 'N/A'
-                                      : vibe.earning.epsEstimated}
+                                      : vibe.earnings.epsEstimated}
                                   </td>
                                   <td
                                     style={{
                                       backgroundColor:
-                                        vibe.earning.eps >
-                                        vibe.earning.epsEstimated
+                                        vibe.earnings.eps >
+                                        vibe.earnings.epsEstimated
                                           ? 'rgb(0, 128, 0, 0.1)' // green with 10% opacity
                                           : 'rgb(255, 0, 0, 0.1)' // red with 10% opacity
                                     }}
                                   >
-                                    {!vibe.earning.eps || vibe.earning.eps <= 0
+                                    {!vibe.earnings.eps || vibe.earnings.eps <= 0
                                       ? 'N/A'
-                                      : vibe.earning.eps}
+                                      : vibe.earnings.eps}
                                   </td>
                                   <td>
-                                    {!vibe.earning.revenueEstimated ||
-                                    vibe.earning.revenueEstimated <= 0
+                                    {!vibe.earnings.revenueEstimated ||
+                                    vibe.earnings.revenueEstimated <= 0
                                       ? 'N/A'
-                                      : vibe.earning.revenueEstimated}
+                                      : vibe.earnings.revenueEstimated}
                                   </td>
                                   <td
                                     style={{
                                       backgroundColor:
-                                        vibe.earning.revenue >
-                                        vibe.earning.revenueEstimated
+                                        vibe.earnings.revenue >
+                                        vibe.earnings.revenueEstimated
                                           ? 'rgb(0, 128, 0, 0.1)' // green with 10% opacity
                                           : 'rgb(255, 0, 0, 0.1)' // red with 10% opacity
                                     }}
                                   >
-                                    {!vibe.earning.revenue ||
-                                    vibe.earning.revenue <= 0
+                                    {!vibe.earnings.revenue ||
+                                    vibe.earnings.revenue <= 0
                                       ? 'N/A'
-                                      : vibe.earning.revenue}
+                                      : vibe.earnings.revenue}
                                   </td>
                                 </tr>
                               </tbody>

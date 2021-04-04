@@ -97,8 +97,8 @@ export default class FMPCloud {
           const d = new Date(e.date);
           return {
             ...e,
-            daysAfter: new Date(getRelativeDate(BeforeOrAfter.after, 1, d)),
-            daysBefore: new Date(getRelativeDate(BeforeOrAfter.before, 1, d))
+            daysAfter: new Date(getRelativeDate(BeforeOrAfter.after, 2, d)),
+            daysBefore: new Date(getRelativeDate(BeforeOrAfter.before, 2, d))
           };
         })
         .slice(0, numberOfPriorEarnings);
@@ -181,13 +181,14 @@ export default class FMPCloud {
         });
 
         if (foundEarnings) {
-          console.log(`found earnings that matches stock date! Pushing into finalData : ${stockData.length}`);
+          const ssd = stockData.sort(
+            (a, b) =>
+              new Date(a.date).valueOf() - new Date(b.date).valueOf()
+          );
+          console.log(`found earnings that matches stock date! Pushing into finalData : ${ssd.length} : start ${ssd[0].date} : end ${ssd[ssd.length - 1].date}`);
           finalData.push({
             earnings: foundEarnings,
-            stock: stockData.sort(
-              (a, b) =>
-                new Date(a.date).valueOf() - new Date(b.date).valueOf()
-            )
+            stock: ssd
           });
         }
       } else {
