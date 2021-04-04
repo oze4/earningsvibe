@@ -181,12 +181,12 @@ export default class FMPCloud {
         });
 
         if (foundEarnings) {
-          console.log(`found earnings that matches stock date! Pushing into finalData\n`);
+          console.log(`found earnings that matches stock date! Pushing into finalData : ${stockData.length}`);
           finalData.push({
             earnings: foundEarnings,
             stock: stockData.sort(
               (a, b) =>
-                new Date(a.date).getTime() - new Date(b.date).getTime()
+                new Date(a.date).valueOf() - new Date(b.date).valueOf()
             )
           });
         }
