@@ -171,7 +171,7 @@ export default class FMPCloud {
     stockDatas.forEach((stockData) => {
       const stock = stockData[0];
       if (stock && stock.date) {
-        console.log(`valid stock data found : `, new Date(stock.date))
+        console.log(`valid stock data found : `, new Date(stock.date));
         const stockDate = new Date(stock.date).valueOf();
         const foundEarnings = earnings.find((e) => {
           const start = new Date(e.daysBefore).valueOf();
@@ -180,27 +180,41 @@ export default class FMPCloud {
           const _start = new Date(new Date(start).setHours(0, 0, 0, 0));
           const _end = new Date(new Date(end).setHours(0, 0, 0, 0));
           const _stockDate = new Date(new Date(stockDate).setHours(0, 0, 0, 0));
+          const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+          var d = new Date();
           console.log({
-            startBefore: new Date(start),
-            start: _start,
-            endBefore: new Date(end),
-            end: _end,
-            stockDateBefore: new Date(stockDate),
-            stockDate: _stockDate,
-            isEarningsFormula: `${_stockDate} >= ${_start} && ${_stockDate} <= ${_end}`,
-            isEarnings: _stockDate.valueOf() >= _start.valueOf() && _stockDate.valueOf() <= _end.valueOf(),
+            dateLocaleStringWithCurrentTimezone: d.toLocaleString('en-US', { timeZone }),
+            timeZone,
+            startBefore: new Date(start).toLocaleString(),
+            startBeforeWithCurrentTimezone: new Date(start).toLocaleString('en-US', { timeZone }),
+            start_hoursZerodOut: new Date(_start).toLocaleString(),
+            endBefore: new Date(end).toLocaleString(),
+            endBeforeWithCurrentTimezone: new Date(end).toLocaleString('en-US', { timeZone }),
+            end_hoursZerodOut: new Date(_end).toLocaleString(),
+            stockDateBefore: new Date(stockDate).toLocaleString(),
+            stockDate_hoursZerodOut: new Date(_stockDate).toLocaleString(),
+            isEarningsFormula: `'${_stockDate}' less than or equal to '${_start}' and greater than or equal to '${_end}'`,
+            isEarnings:
+              _stockDate.valueOf() >= _start.valueOf() &&
+              _stockDate.valueOf() <= _end.valueOf()
           });
           // console.log({ start: new Date(new Date(start).setHours(0, 0, 0, 0)), end: new Date(new Date(end).setHours(0, 0, 0, 0)), stockDate: new Date(new Date(stockDate).setHours(0, 0, 0, 0)), isEarnings: `${new Date(stockDate).setHours(0, 0, 0, 0)} >= ${new Date(start).setHours(0, 0, 0, 0)} && ${new Date(stockDate).setHours(0, 0, 0, 0)} <= ${new Date(end).setHours(0, 0, 0, 0)} === ${new Date(stockDate).setHours(0, 0, 0, 0) >= new Date(start).setHours(0, 0, 0, 0) && new Date(stockDate).setHours(0, 0, 0, 0) <= new Date(end).setHours(0, 0, 0, 0)}` })
           //return new Date(stockDate).setHours(0, 0, 0, 0) >= new Date(start).setHours(0, 0, 0, 0) && new Date(stockDate).setHours(0, 0, 0, 0) <= new Date(end).setHours(0, 0, 0, 0);
-          return _stockDate.valueOf() >= _start.valueOf() && _stockDate.valueOf() <= _end.valueOf();
+          return (
+            _stockDate.valueOf() >= _start.valueOf() &&
+            _stockDate.valueOf() <= _end.valueOf()
+          );
         });
 
         if (foundEarnings) {
           const ssd = stockData.sort(
-            (a, b) =>
-              new Date(a.date).valueOf() - new Date(b.date).valueOf()
+            (a, b) => new Date(a.date).valueOf() - new Date(b.date).valueOf()
           );
-          console.log(`found earnings that matches stock date! Pushing into finalData : ${ssd.length} : start ${ssd[0].date} : end ${ssd[ssd.length - 1].date}`);
+          console.log(
+            `found earnings that matches stock date! Pushing into finalData : ${
+              ssd.length
+            } : start ${ssd[0].date} : end ${ssd[ssd.length - 1].date}`
+          );
           finalData.push({
             earnings: foundEarnings,
             stock: ssd
