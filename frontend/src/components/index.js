@@ -6,3 +6,4 @@ export { default as CandleStickChartWithMA } from './Charts/CandleStickChartWith
 export { default as CandleStickChartWithBrush } from './Charts/CandleStickChartWithBrush';
 export { default as Overlay } from './Overlay';
 export { default as Input } from './Input';
+export { default as EarningsVibeCard } from './EarningsVibeCard';
